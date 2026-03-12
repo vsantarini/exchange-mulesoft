@@ -7,9 +7,9 @@ pipeline {
  ANYPOINT_CLIENT_SECRET  = credentials('anypoint-client-secret')
  ANYPOINT_ORG_ID      = credentials('anypoint-org-id')
  ANYPOINT_ENV_ID      = credentials('anypoint-env-id')
- OPENAI_API_KEY       = credentials('openai-api-key')
+ //OPENAI_API_KEY       = credentials('openai-api-key')
  EXCEL_FILE          = "api-catalog.xlsx"
- NOTIFY_EMAIL        = "team@example.com"
+ NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
  }
 
