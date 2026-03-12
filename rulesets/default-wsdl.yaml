@@ -1,0 +1,23 @@
+# Note: Spectral ha supporto limitato per WSDL.
+# Questo ruleset applica regole base su XML/WSDL tramite pattern matching.
+
+rules:
+
+ wsdl-service-defined:
+ description: "WSDL must define at least one service"
+ severity: error
+ given: "$"
+ then:
+ function: schema
+ functionOptions:
+ schema:
+ type: object
+ required:
+ - "definitions"
+
+ wsdl-documentation-required:
+ description: "WSDL must include documentation element"
+ severity: warning
+ given: "$"
+ then:
+ function: truthy

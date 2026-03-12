@@ -1,52 +1,10 @@
-Tipo	Policy Template	Parametri Chiave
-routing	http-proxy	upstreamUri, connectTimeout, readTimeout
-mtls	tls-enforcement	truststoreFile, keystoreFile, clientCertRequired
-request-validation	request-validation	enableSchemaValidation, maxRequestSize, allowedMethods, requiredHeaders
-security (JWT)	jwt-validation	jwksUrl, signingMethod, scopes
-security (OAuth2)	oauth2-access-token-enforcement	tokenUrl, scopes
-security (IP)	ip-allowlist	allowedIps
-rate-limiting	rate-limiting	maxRequests, timePeriodMs
-throttling	throttling	maxRequests, timePeriodMs
-spike-control	spike-control	maxRequests, timePeriodMs
+⚠️ Prerequisiti Jenkins:
 
+Credenziali configurate in Jenkins Credentials Store: anypoint-client-id, anypoint-client-secret, anypoint-org-id, openai-api-key
+Agent Jenkins con Python 3.x installato
+Accesso di rete ad anypoint.mulesoft.com e api.openai.com
 
-repo/
-├── Jenkinsfile
-├── api-deployment.xlsx ← 4 sheet: Deployments, Policies, SLA, Alerts
-├── policies/
-│ ├── my-custom-header-policy.jar ← JAR compilato
-│ └── my-custom-header-policy.yaml ← descrittore policy
-├── scripts/
-│ ├── authenticate.py
-│ ├── notify.py
-│ └── deploy/
-│ ├── read_excel.py
-│ ├── authenticate_with_refresh.py ← NUOVO
-│ ├── governance_check.py ← NUOVO
-│ ├── validate_assets.py
-│ ├── validate_gateways.py
-│ ├── manage_certificates.py ← NUOVO
-│ ├── manage_sla_tiers.py ← NUOVO
-│ ├── register_api_instance.py
-│ ├── deploy_flex_gateway.py
-│ ├── validate_custom_policies.py ← NUOVO
-│ ├── publish_custom_policies.py ← NUOVO
-│ └── apply_policies.py ← AGGIORNATO
-│ ├── configure_autodiscovery.py ← NUOVO
-│ ├── configure_alerting.py ← NUOVO
-│ ├── health_check.py ← NUOVO
-│ ├── rollback.py ← NUOVO
-│ └── generate_audit_report.py ← NUOVO
-└── autodiscovery-config/ ← generato dalla pipeline
-
-
-Requisito	Dettaglio
-HashiCorp Vault	Configurato con KV secrets engine per i certificati
-Anypoint Secret Manager	Abilitato sull'organizzazione target
-hvac	pip install hvac
-cryptography	pip install cryptography
-jinja2	pip install jinja2
-Jenkins param: DRY_RUN	Boolean parameter abilitato sul job
-Jenkins param: TARGET_ENV	Choice parameter: dev/test/prod
-Jenkins credential: vault-token	Token di accesso a HashiCorp Vault
-Jenkins credential: vault-addr	Indirizzo del Vault server
+Requisito	Comando
+Spectral CLI	npm install -g @stoplight/spectral-cli
+Node.js	>= 16.x
+Spectral disponibile sull'agent Jenkins	Verificare con spectral --version

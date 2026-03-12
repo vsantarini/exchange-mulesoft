@@ -2,22 +2,15 @@ pipeline {
  agent any
 
  environment {
- ANYPOINT_HOST = "https://anypoint.mulesoft.com"
- ANYPOINT_CLIENT_ID = credentials('anypoint-client-id')
- ANYPOINT_CLIENT_SECRET = credentials('anypoint-client-secret')
- ANYPOINT_ORG_ID = credentials('anypoint-org-id')
- VAULT_TOKEN = credentials('vault-token')
- VAULT_ADDR = credentials('vault-addr')
- TEAMS_WEBHOOK = credentials('teams-webhook-url')
- NOTIFY_EMAIL = "team@example.com"
- EXCEL_FILE = "api-deployment.xlsx"
- DRY_RUN = "${params.DRY_RUN ?: 'false'}"
- TARGET_ENV = "${params.TARGET_ENV ?: 'dev'}"
- }
-
- parameters {
- booleanParam(name: 'DRY_RUN', defaultValue: false, description: 'Simulate pipeline without applying changes')
- choice(name: 'TARGET_ENV', choices: ['dev', 'test', 'prod'], description: 'Target deployment environment')
+ ANYPOINT_HOST       = "https://anypoint.mulesoft.com"
+ ANYPOINT_CLIENT_ID     = credentials('anypoint-client-id')
+ ANYPOINT_CLIENT_SECRET  = credentials('anypoint-client-secret')
+ ANYPOINT_ORG_ID      = credentials('anypoint-org-id')
+ ANYPOINT_ENV_ID      = credentials('anypoint-env-id')
+ OPENAI_API_KEY       = credentials('openai-api-key')
+ EXCEL_FILE          = "api-catalog.xlsx"
+ NOTIFY_EMAIL        = "team@example.com"
+ TEAMS_WEBHOOK       = credentials('teams-webhook-url')
  }
 
  stages {
@@ -30,8 +23,8 @@ pipeline {
  steps {
  sh '''
  pip install --quiet \
- openpyxl requests pyyaml \
- hvac boto3 jinja2
+ openpyxl requests openai pyyaml \
+ zeep Pillow swagger-spec-validator
  '''
  }
  }
@@ -39,22 +32,20 @@ pipeline {
  stage('Read Excel') {
  steps {
  sh '''
- python3 scripts/deploy/read_excel.py \
+ python3 scripts/read_excel.py \
  --file ${EXCEL_FILE} \
- --output-deployments deployment-list.json \
- --output-policies policy-list.json \
- --output-alerts alert-list.json \
- --output-sla sla-list.json \
- --env ${TARGET_ENV}
+ --output-apis api-list.json \
+ --output-apps app-list.json \
+ --output-contracts contract-list.json
  '''
- archiveArtifacts artifacts: 'deployment-list.json, policy-list.json, alert-list.json, sla-list.json'
+ archiveArtifacts artifacts: 'api-list.json, app-list.json, contract-list.json'
  }
  }
 
  stage('Authenticate') {
  steps {
  sh '''
- python3 scripts/deploy/authenticate_with_refresh.py \
+ python3 scripts/authenticate.py \
  --client-id ${ANYPOINT_CLIENT_ID} \
  --client-secret ${ANYPOINT_CLIENT_SECRET} \
  --output token.json
@@ -62,241 +53,166 @@ pipeline {
  }
  }
 
- // ── NUOVO: Governance & Compliance Check ──────────
- stage('Governance & Compliance Check') {
+ // ── NUOVO ──────────────────────────────────────
+ stage('Validate Specs') {
  steps {
  sh '''
- python3 scripts/deploy/governance_check.py \
- --deployment-list deployment-list.json \
- --policy-list policy-list.json \
- --env ${TARGET_ENV} \
- --dry-run ${DRY_RUN}
+ python3 scripts/validate_specs.py \
+ --api-list api-list.json \
+ --fail-on-warnings
  '''
+ archiveArtifacts artifacts: 'spectral-reports/**'
  }
- }
+}
 
- stage('Validate Assets') {
+ // ── NUOVO ──────────────────────────────────────
+ stage('Check Version Conflicts') {
  steps {
  sh '''
- python3 scripts/deploy/validate_assets.py \
- --deployment-list deployment-list.json \
+ python3 scripts/check_versions.py \
+ --api-list api-list.json \
  --token token.json \
  --org-id ${ANYPOINT_ORG_ID}
  '''
  }
  }
 
- stage('Validate Gateways') {
+ // ── NUOVO ──────────────────────────────────────
+ stage('Ensure Categories Exist') {
  steps {
  sh '''
- python3 scripts/deploy/validate_gateways.py \
- --deployment-list deployment-list.json \
+ python3 scripts/ensure_categories.py \
+ --api-list api-list.json \
  --token token.json \
  --org-id ${ANYPOINT_ORG_ID}
  '''
  }
  }
 
- // ── NUOVO: Upload Certificates ────────────────────
- stage('Upload Certificates') {
+ stage('Generate AI Documentation') {
  steps {
  sh '''
- python3 scripts/deploy/manage_certificates.py \
- --policy-list policy-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --vault-token ${VAULT_TOKEN} \
- --vault-addr ${VAULT_ADDR} \
- --dry-run ${DRY_RUN} \
- --output cert-refs.json
+ python3 scripts/generate_docs.py \
+ --api-list api-list.json \
+ --openai-key ${OPENAI_API_KEY} \
+ --output-dir generated-docs/
  '''
- archiveArtifacts artifacts: 'cert-refs.json'
+ archiveArtifacts artifacts: 'generated-docs/**'
  }
  }
 
- // ── NUOVO: Verify/Create SLA Tiers ───────────────
- stage('Manage SLA Tiers') {
+ stage('Publish Assets') {
  steps {
  sh '''
- python3 scripts/deploy/manage_sla_tiers.py \
- --sla-list sla-list.json \
- --deployment-list deployment-list.json \
+ python3 scripts/publish_assets.py \
+ --api-list api-list.json \
  --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
+ --org-id ${ANYPOINT_ORG_ID}
  '''
  }
  }
-
- stage('Register API Instance') {
+ 
+ stage('Publish SOAP Definition Pages') {
  steps {
  sh '''
- python3 scripts/deploy/register_api_instance.py \
- --deployment-list deployment-list.json \
+ python3 scripts/publish_soap_pages.py \
+ --api-list api-list.json \
  --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN} \
- --output api-instances.json
- '''
- archiveArtifacts artifacts: 'api-instances.json'
- }
- }
-
- stage('Deploy to Flex Gateway') {
- steps {
- sh '''
- python3 scripts/deploy/deploy_flex_gateway.py \
- --deployment-list deployment-list.json \
- --api-instances api-instances.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
- '''
- }
- }
-
-// ── NUOVO: Validate Custom Policy Assets ─────────
-stage('Validate Custom Policy Assets') {
- steps {
- sh '''
- python3 scripts/deploy/validate_custom_policies.py \
- --policy-list policy-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
+ --org-id ${ANYPOINT_ORG_ID}
  '''
  }
 }
 
-// ── NUOVO: Publish Custom Policy Assets ──────────
-stage('Publish Custom Policy Assets') {
+ stage('Assign Tags & Categories') {
  steps {
  sh '''
- python3 scripts/deploy/publish_custom_policies.py \
- --policy-list policy-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
- '''
- }
-}
-
-// ── ESISTENTE: Apply Policies (aggiornato) ────────
-stage('Apply Policies') {
- steps {
- sh '''
- python3 scripts/deploy/apply_policies.py \
- --policy-list policy-list.json \
- --api-instances api-instances.json \
- --cert-refs cert-refs.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
- '''
- }
-}
-
- // ── NUOVO: Configure Autodiscovery ───────────────
- stage('Configure Autodiscovery') {
- steps {
- sh '''
- python3 scripts/deploy/configure_autodiscovery.py \
- --api-instances api-instances.json \
- --deployment-list deployment-list.json \
- --dry-run ${DRY_RUN} \
- --output autodiscovery-config/
- '''
- archiveArtifacts artifacts: 'autodiscovery-config/**'
- }
- }
-
- // ── NUOVO: Configure Alerting ─────────────────────
- stage('Configure Alerting') {
- steps {
- sh '''
- python3 scripts/deploy/configure_alerting.py \
- --alert-list alert-list.json \
- --api-instances api-instances.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
- '''
- }
- }
-
- // ── NUOVO: Health Check / Smoke Test ─────────────
- stage('Health Check') {
- steps {
- sh '''
- python3 scripts/deploy/health_check.py \
- --deployment-list deployment-list.json \
- --api-instances api-instances.json \
+ python3 scripts/assign_tags.py \
+ --api-list api-list.json \
  --token token.json \
  --org-id ${ANYPOINT_ORG_ID}
  '''
  }
  }
 
- // ── NUOVO: Audit Report ───────────────────────────
- stage('Generate Audit Report') {
+ stage('Upload Integration Pattern Image') {
  steps {
  sh '''
- python3 scripts/deploy/generate_audit_report.py \
- --deployment-list deployment-list.json \
- --policy-list policy-list.json \
- --api-instances api-instances.json \
- --env ${TARGET_ENV} \
- --dry-run ${DRY_RUN} \
- --output audit-report.json
+ python3 scripts/upload_image.py \
+ --api-list api-list.json \
+ --token token.json \
+ --org-id ${ANYPOINT_ORG_ID}
  '''
- archiveArtifacts artifacts: 'audit-report.json'
  }
  }
 
- // ── NUOVO: Manual Approval Gate (PROD only) ───────
- stage('Manual Approval') {
- when {
- expression { return params.TARGET_ENV == 'prod' && params.DRY_RUN == false }
- }
+ stage('Update & Publish Home Page') {
  steps {
- input message: "Approve deployment to PRODUCTION?",
- ok: "Deploy to PROD",
- submitter: "ops-team"
+ sh '''
+ python3 scripts/update_home_page.py \
+ --api-list api-list.json \
+ --token token.json \
+ --org-id ${ANYPOINT_ORG_ID} \
+ --docs-dir generated-docs/
+
+ python3 scripts/publish_pages.py \
+ --api-list api-list.json \
+ --token token.json \
+ --org-id ${ANYPOINT_ORG_ID}
+ '''
  }
  }
 
+ stage('Create/Update Consumer Applications') {
+ steps {
+ sh '''
+ python3 scripts/manage_applications.py \
+ --app-list app-list.json \
+ --token token.json \
+ --org-id ${ANYPOINT_ORG_ID} \
+ --output app-ids.json
+ '''
+ archiveArtifacts artifacts: 'app-ids.json'
+ }
+ }
+
+ stage('Create Contracts') {
+ steps {
+ sh '''
+ python3 scripts/manage_contracts.py \
+ --contract-list contract-list.json \
+ --app-ids app-ids.json \
+ --token token.json \
+ --org-id ${ANYPOINT_ORG_ID} \
+ --env-id ${ANYPOINT_ENV_ID}
+ '''
+ }
+ }
+
+ // ── NUOVO ──────────────────────────────────────
  stage('Notify') {
  steps {
  sh '''
  python3 scripts/notify.py \
- --api-list deployment-list.json \
+ --api-list api-list.json \
  --teams-webhook ${TEAMS_WEBHOOK} \
  --email ${NOTIFY_EMAIL} \
- --status success \
- --env ${TARGET_ENV} \
- --dry-run ${DRY_RUN}
+ --status success
  '''
  }
  }
  }
 
  post {
+ success {
+ echo '✅ Pipeline completed successfully.'
+ }
  failure {
  sh '''
- python3 scripts/deploy/rollback.py \
- --api-instances api-instances.json \
- --policy-list policy-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --dry-run ${DRY_RUN}
-
  python3 scripts/notify.py \
- --api-list deployment-list.json \
+ --api-list api-list.json \
  --teams-webhook ${TEAMS_WEBHOOK} \
  --email ${NOTIFY_EMAIL} \
- --status failure \
- --env ${TARGET_ENV} \
- --dry-run ${DRY_RUN}
+ --status failure
  '''
  }
  always {

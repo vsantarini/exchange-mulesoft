@@ -1,0 +1,32 @@
+extends:
+ - rulesets/default-oas.yaml # estende il ruleset base aziendale
+
+rules:
+
+ # Regola specifica per le API Finance
+ finance-header-correlation-id:
+ description: "Finance APIs must require X-Correlation-ID header"
+ severity: error
+ given: "$.paths.*[get,post,put,patch,delete].parameters[?(@.in == 'header')]"
+ then:
+ function: schema
+ functionOptions:
+ schema:
+ type: object
+ properties:
+ name:
+ enum:
+ - "X-Correlation-ID"
+
+ finance-response-envelope:
+ description: "Finance API responses must use a standard envelope"
+ severity: error
+ given: "$.paths.*[post,put,patch].responses.200.content.application/json.schema"
+ then:
+ function: schema
+ functionOptions:
+ schema:
+ type: object
+ required:
+ - data
+ - metadata
