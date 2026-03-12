@@ -9,8 +9,8 @@ pipeline {
  ANYPOINT_ENV_ID      = credentials('anypoint-env-id')
  OPENAI_API_KEY       = credentials('openai-api-key')
  EXCEL_FILE          = "api-catalog.xlsx"
- NOTIFY_EMAIL        = "team@example.com"
- TEAMS_WEBHOOK       = credentials('teams-webhook-url')
+ NOTIFY_EMAIL        = "v.santarini@reply.it"
+ //TEAMS_WEBHOOK       = credentials('teams-webhook-url')
  }
 
  stages {
@@ -189,7 +189,8 @@ pipeline {
  }
 
  // ── NUOVO ──────────────────────────────────────
- stage('Notify') {
+/** 
+stage('Notify') {
  steps {
  sh '''
  python3 scripts/notify.py \
@@ -218,5 +219,13 @@ pipeline {
  always {
  cleanWs()
  }
+ }
+ **/
+
+  stage('Cleanup') {
+ steps {
+ cleanWs()
+ }
+}
  }
 }
