@@ -36,4 +36,4 @@ if __name__ == "__main__":
  with open(args.output_contracts, "w") as f:
     json.dump(contracts, f, indent=2)
 
- print(f"✅ APIs: {len(apis)} | Apps: {len(apps)} | Contracts: {len(contracts)}")
+ print(f"APIs: {len(apis)} | Apps: {len(apps)} | Contracts: {len(contracts)}")
