@@ -189,7 +189,8 @@ pipeline {
  }
 
  // ── NUOVO ──────────────────────────────────────
- stage('Notify') {
+/** 
+stage('Notify') {
  steps {
  sh '''
  python3 scripts/notify.py \
@@ -218,5 +219,13 @@ pipeline {
  always {
  cleanWs()
  }
+ }
+ **/
+
+  stage('Cleanup') {
+ steps {
+ cleanWs()
+ }
+}
  }
 }
