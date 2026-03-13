@@ -5,12 +5,11 @@ import os
 import sys
 
 SPECTRAL_BINARY = os.environ.get("SPECTRAL", "spectral")
-print (SPECTRAL_BINARY)
 
 def check_spectral_installed():
     command = "where" if sys.platform == "win32" else "which"
     result = subprocess.run(
-        [command, SPECTRAL_BINARY],
+        [command, SPECTRAL_BINARY + "--version"],
         capture_output=True
     )
     if result.returncode != 0:
