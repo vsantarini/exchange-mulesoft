@@ -20,20 +20,15 @@ pipeline {
  }
 
  stage('Install Dependencies') {
- steps {
- sh '''
- pip install --quiet \
- openpyxl requests openai pyyaml \
- zeep Pillow swagger-spec-validator
- '''
- }
- }
- 
- stage('Debug Workspace') {
- steps {
- bat 'cd'
- bat 'dir'
- }
+	 steps {
+	 bat 'pip install --quiet openpyxl'
+	 bat 'pip install --quiet requests'
+	 bat 'pip install --quiet openai'
+	 bat 'pip install --quiet pyyaml'
+	 bat 'pip install --quiet zeep'
+	 bat 'pip install --quiet Pillow'
+	 bat 'pip install --quiet swagger-spec-validator'
+	 }
 }
 
  stage('Read Excel') {
