@@ -11,7 +11,7 @@ pipeline {
  EXCEL_FILE          = "api-catalog.xlsx"
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
- PYTHON				 = "C:\Users\v.santarini\AppData\Local\Microsoft\WindowsApps\python.exe"
+ PYTHON				 = "C:/Users/v.santarini/AppData/Local/Microsoft/WindowsApps/python.exe"
  }
 
  stages {
