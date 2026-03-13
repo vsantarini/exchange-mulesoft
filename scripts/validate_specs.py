@@ -7,10 +7,11 @@ import sys
 SPECTRAL_BINARY = os.environ.get("SPECTRAL", "spectral")
 
 def check_spectral_installed():
-    command = "where" if sys.platform == "win32" else "which"
     result = subprocess.run(
-        [command, SPECTRAL_BINARY + "--version"],
-        capture_output=True
+        [SPECTRAL_BINARY, "--version"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8"
     )
     if result.returncode != 0:
         print("[ERROR] Spectral CLI not found. Install it with: npm install -g @stoplight/spectral-cli")
