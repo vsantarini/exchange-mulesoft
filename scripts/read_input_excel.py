@@ -10,9 +10,9 @@ def read_sheet(ws):
  headers = [cell.value for cell in ws[1]]
  rows = []
  for row in ws.iter_rows(min_row=2, values_only=True):
- record = dict(zip(headers, row))
+    record = dict(zip(headers, row))
  if any(record.values()):
- rows.append(record)
+    rows.append(record)
  return rows
 
 if __name__ == "__main__":
@@ -30,10 +30,10 @@ if __name__ == "__main__":
  contracts = read_sheet(wb[SHEET_CONTRACTS])
 
  with open(args.output_apis, "w") as f:
- json.dump(apis, f, indent=2)
+    json.dump(apis, f, indent=2)
  with open(args.output_apps, "w") as f:
- json.dump(apps, f, indent=2)
+    json.dump(apps, f, indent=2)
  with open(args.output_contracts, "w") as f:
- json.dump(contracts, f, indent=2)
+    json.dump(contracts, f, indent=2)
 
  print(f"✅ APIs: {len(apis)} | Apps: {len(apps)} | Contracts: {len(contracts)}")
