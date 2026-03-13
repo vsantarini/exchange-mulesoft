@@ -36,23 +36,23 @@ if __name__ == "__main__":
  args = parser.parse_args()
 
  with open(args.api_list) as f:
- apis = json.load(f)
+    apis = json.load(f)
  with open(args.token) as f:
- token = json.load(f)["access_token"]
+    token = json.load(f)["access_token"]
 
  existing = get_existing_categories(args.org_id, token)
 
  # Collect all unique categories from Excel
  required = set()
  for api in apis:
- for cat in str(api.get("categories", "")).split(","):
- cat = cat.strip()
- if cat:
- required.add(cat)
+    for cat in str(api.get("categories", "")).split(","):
+        cat = cat.strip()
+        if cat:
+            required.add(cat)
 
  for cat in required:
- if cat not in existing:
- print(f"⚠️ Category '{cat}' not found — creating it...")
- create_category(cat, args.org_id, token)
- else:
- print(f"✅ Category '{cat}' already exists.")
+    if cat not in existing:
+        print(f"|WARN| Category '{cat}' not found — creating it...")
+        create_category(cat, args.org_id, token)
+    else:
+        print(f"|OK| Category '{cat}' already exists.")
