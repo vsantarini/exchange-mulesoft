@@ -21,19 +21,19 @@ if __name__ == "__main__":
  args = parser.parse_args()
 
  with open(args.api_list) as f:
- apis = json.load(f)
+    apis = json.load(f)
  with open(args.token) as f:
- token = json.load(f)["access_token"]
+    token = json.load(f)["access_token"]
 
  conflicts = []
  for api in apis:
- if version_exists(api, token, args.org_id):
- conflicts.append(f"{api['assetId']} v{api['version']}")
+    if version_exists(api, token, args.org_id):
+        conflicts.append(f"{api['assetId']} v{api['version']}")
 
  if conflicts:
- print("❌ Version conflicts detected:")
- for c in conflicts:
- print(f" - {c} already exists on Exchange.")
- exit(1)
+    print("|KO| Version conflicts detected:")
+    for c in conflicts:
+        print(f" - {c} already exists on Exchange.")
+        exit(1)
  else:
- print("✅ No version conflicts detected.")
+    print("|OK| No version conflicts detected.")
