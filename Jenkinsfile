@@ -11,6 +11,7 @@ pipeline {
  EXCEL_FILE          = "api-catalog.xlsx"
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
+ PYTHON				 = "C:\Users\v.santarini\AppData\Local\Microsoft\WindowsApps\python.exe"
  }
 
  stages {
@@ -21,13 +22,13 @@ pipeline {
 
  stage('Install Dependencies') {
 	 steps {
-	 bat 'python -m pip install --quiet openpyxl'
-	 bat 'python -m pip install --quiet requests'
-	 bat 'python -m pip install --quiet openai'
-	 bat 'python -m pip install --quiet pyyaml'
-	 bat 'python -m pip install --quiet zeep'
-	 bat 'python -m pip install --quiet Pillow'
-	 bat 'python -m pip install --quiet swagger-spec-validator'
+	 bat '%PYTHON% -m pip install --quiet openpyxl'
+	 bat '%PYTHON% -m pip install --quiet requests'
+	 bat '%PYTHON% -m pip install --quiet openai'
+	 bat '%PYTHON% -m pip install --quiet pyyaml'
+	 bat '%PYTHON% -m pip install --quiet zeep'
+	 bat '%PYTHON% -m pip install --quiet Pillow'
+	 bat '%PYTHON% -m pip install --quiet swagger-spec-validator'
 	 }
 }
 
