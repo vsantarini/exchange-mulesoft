@@ -11,7 +11,7 @@ pipeline {
  EXCEL_FILE          = "api-catalog.xlsx"
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
- PYTHON				 = "C:/Users/v.santarini/AppData/Local/Microsoft/WindowsApps/python.exe"
+
  }
 
  stages {
@@ -20,12 +20,28 @@ pipeline {
  steps { checkout scm }
  }
  
+stage('Install Python') {
+ steps {
+ bat '''
+ IF EXIST "%PYTHON%" (
+ echo Python already installed — skipping.
+ ) ELSE (
+ echo Installing Python...
+ curl -o python-installer.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
+ python-installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+ echo Python installed successfully.
+ )
+ '''
+ }
+ }
+
  stage('Debug') {
  steps {
  bat '"%PYTHON%" --version'
  bat '"%PYTHON%" -m pip --version'
+ bat 'dir'
  }
-}
+ }
 
  stage('Install Dependencies') {
 	 steps {
