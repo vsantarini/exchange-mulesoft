@@ -12,6 +12,8 @@ pipeline {
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
  PYTHON = "C:\\Program Files\\Python311\\python.exe"
+ PYTHONHOME = "C:\\Program Files\\Python311"
+ PYTHONPATH = "C:\\Program Files\\Python311\\Lib;C:\\Program Files\\Python311\\DLLs"
  }
 
  stages {
@@ -20,21 +22,6 @@ pipeline {
  steps { checkout scm }
  }
  
-stage('Install Python') {
- steps {
- bat '''
- IF EXIST "%PYTHON%" (
- echo Python already installed — skipping.
- ) ELSE (
- echo Installing Python...
- curl -o python-installer.exe https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe
- python-installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
- echo Python installed successfully.
- )
- '''
- }
- }
-
  stage('Debug') {
  steps {
  bat '"%PYTHON%" --version'
