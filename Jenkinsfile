@@ -14,6 +14,8 @@ pipeline {
  PYTHON = "C:\\Python311\\python.exe"
  PYTHONHOME = "C:\\Python311"
  PYTHONPATH = "C:\\Python311\\Lib;C:\\Python311\\DLLs"
+ PYTHONIOENCODING       = "utf-8"
+ NODE_HOME              = "C:\\Program Files\\nodejs"
  }
 
  stages {
@@ -41,6 +43,37 @@ pipeline {
 	 bat '%PYTHON% -m pip install --quiet swagger-spec-validator'
 	 }
 }
+
+stage('Install Node.js') {
+    steps {
+        bat '''
+                    IF EXIST "%NODE_HOME%\\node.exe" (
+                        echo [OK] Node.js already installed.
+                    ) ELSE (
+                        echo [INFO] Installing Node.js...
+                        curl -o node-installer.msi https://nodejs.org/dist/v20.11.0/node-v20.11.0-x64.msi
+                        msiexec /i node-installer.msi /quiet /norestart
+                        echo [OK] Node.js installed.
+                    )
+                '''
+                bat '"%NODE_HOME%\\node.exe" --version'
+            }
+        }
+
+stage('Install Spectral') {
+    steps {
+                bat '''
+                    IF EXIST "%NODE_HOME%\\node_modules\\@stoplight\\spectral-cli\\bin\\spectral.js" (
+                        echo [OK] Spectral already installed.
+                    ) ELSE (
+                        echo [INFO] Installing Spectral CLI...
+                        "%NODE_HOME%\\npm.cmd" install -g @stoplight/spectral-cli
+                        echo [OK] Spectral CLI installed.
+                    )
+                '''
+                bat '"%NODE_HOME%\\npx.cmd" spectral --version'
+            }
+        }
 
  stage('Read Excel') {
  steps {
