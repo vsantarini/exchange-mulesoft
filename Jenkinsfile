@@ -97,80 +97,41 @@ bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --clien
 
  stage('Assign Tags & Categories') {
  steps {
- sh '''
- python3 scripts/assign_tags.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+bat '"%PYTHON%" scripts/assign_tags.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
 
  stage('Upload Integration Pattern Image') {
  steps {
- sh '''
- python3 scripts/upload_image.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/upload_image.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
 
  stage('Update & Publish Home Page') {
  steps {
- sh '''
- python3 scripts/update_home_page.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --docs-dir generated-docs/
-
- python3 scripts/publish_pages.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/update_home_page.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID% --docs-dir generated-docs'
+ bat '"%PYTHON%" scripts/publish_pages.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
 
  stage('Create/Update Consumer Applications') {
  steps {
- sh '''
- python3 scripts/manage_applications.py \
- --app-list app-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --output app-ids.json
- '''
+ bat '"%PYTHON%" scripts/manage_applications.py --app-list app-list.json --token token.json --org-id %ANYPOINT_ORG_ID% --output app-ids.json'
  archiveArtifacts artifacts: 'app-ids.json'
  }
  }
 
  stage('Create Contracts') {
  steps {
- sh '''
- python3 scripts/manage_contracts.py \
- --contract-list contract-list.json \
- --app-ids app-ids.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID} \
- --env-id ${ANYPOINT_ENV_ID}
- '''
+ bat '"%PYTHON%" scripts/manage_contracts.py --contract-list contract-list.json --app-ids app-ids.json --token token.json --org-id %ANYPOINT_ORG_ID% --env-id %ANYPOINT_ENV_ID%'
  }
  }
 
  // ── NUOVO ──────────────────────────────────────
-/** 
+ 
 stage('Notify') {
  steps {
- sh '''
- python3 scripts/notify.py \
- --api-list api-list.json \
- --teams-webhook ${TEAMS_WEBHOOK} \
- --email ${NOTIFY_EMAIL} \
- --status success
- '''
+ bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status success'
  }
  }
  }
@@ -180,19 +141,10 @@ stage('Notify') {
  echo '✅ Pipeline completed successfully.'
  }
  failure {
- sh '''
- python3 scripts/notify.py \
- --api-list api-list.json \
- --teams-webhook ${TEAMS_WEBHOOK} \
- --email ${NOTIFY_EMAIL} \
- --status failure
- '''
- }
- always {
- cleanWs()
+ bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
  }
  }
- **/
+
 
   stage('Cleanup') {
  steps {
@@ -200,4 +152,3 @@ stage('Notify') {
  }
 }
  }
-}
