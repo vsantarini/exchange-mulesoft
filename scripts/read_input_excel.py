@@ -11,8 +11,9 @@ def read_sheet(ws):
  rows = []
  for row in ws.iter_rows(min_row=2, values_only=True):
     record = dict(zip(headers, row))
- if any(record.values()):
-    rows.append(record)
+    # Corretto — if dentro il for
+    if any(v is not None for v in record.values()):
+        rows.append(record)
  return rows
 
 if __name__ == "__main__":
