@@ -58,7 +58,7 @@ bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --clien
  // ── NUOVO ──────────────────────────────────────
  stage('Validate Specs') {
  steps {
- bat '"%PYTHON%" scripts/deploy/validate_specs.py --deployment-list deployment-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
+ bat '"%PYTHON%" scripts/validate_specs.py --deployment-list deployment-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
 }
 
