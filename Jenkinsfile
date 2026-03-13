@@ -7,7 +7,7 @@ pipeline {
  ANYPOINT_CLIENT_SECRET  = credentials('anypoint-client-secret')
  ANYPOINT_ORG_ID      = credentials('anypoint-org-id')
  ANYPOINT_ENV_ID      = credentials('anypoint-env-id')
- //OPENAI_API_KEY       = credentials('openai-api-key')
+ OPENAI_API_KEY       = credentials('openai-api-key')
  EXCEL_FILE          = ".\\api-catalog.xlsx"
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
@@ -44,95 +44,54 @@ pipeline {
 
  stage('Read Excel') {
  steps {
- sh '''
- python3 scripts/read_excel.py \
- --file ${EXCEL_FILE} \
- --output-apis api-list.json \
- --output-apps app-list.json \
- --output-contracts contract-list.json
- '''
- archiveArtifacts artifacts: 'api-list.json, app-list.json, contract-list.json'
+	bat '"%PYTHON%" scripts/read_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json --output-contracts contract-list.json'
  }
  }
 
+
  stage('Authenticate') {
  steps {
- sh '''
- python3 scripts/authenticate.py \
- --client-id ${ANYPOINT_CLIENT_ID} \
- --client-secret ${ANYPOINT_CLIENT_SECRET} \
- --output token.json
- '''
+bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --client-secret %ANYPOINT_CLIENT_SECRET% --output token.json'
  }
  }
 
  // ── NUOVO ──────────────────────────────────────
  stage('Validate Specs') {
  steps {
- sh '''
- python3 scripts/validate_specs.py \
- --api-list api-list.json \
- --fail-on-warnings
- '''
- archiveArtifacts artifacts: 'spectral-reports/**'
+ bat '"%PYTHON%" scripts/deploy/validate_assets.py --deployment-list deployment-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
 }
 
  // ── NUOVO ──────────────────────────────────────
  stage('Check Version Conflicts') {
  steps {
- sh '''
- python3 scripts/check_versions.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/check_versions.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
 
  // ── NUOVO ──────────────────────────────────────
  stage('Ensure Categories Exist') {
  steps {
- sh '''
- python3 scripts/ensure_categories.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/ensure_categories.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
 
  stage('Generate AI Documentation') {
  steps {
- sh '''
- python3 scripts/generate_docs.py \
- --api-list api-list.json \
- --openai-key ${OPENAI_API_KEY} \
- --output-dir generated-docs/
- '''
+ bat '"%PYTHON%" scripts/generate_docs.py --api-list api-list.json --openai-key %OPENAI_API_KEY% --output-dir generated-docs/'
  archiveArtifacts artifacts: 'generated-docs/**'
  }
  }
 
  stage('Publish Assets') {
  steps {
- sh '''
- python3 scripts/publish_assets.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/publish_assets.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
  }
  
  stage('Publish SOAP Definition Pages') {
  steps {
- sh '''
- python3 scripts/publish_soap_pages.py \
- --api-list api-list.json \
- --token token.json \
- --org-id ${ANYPOINT_ORG_ID}
- '''
+ bat '"%PYTHON%" scripts/publish_soap_pages.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
  }
 }
 
