@@ -28,6 +28,13 @@ pipeline {
  '''
  }
  }
+ 
+ stage('Debug Workspace') {
+ steps {
+ bat 'cd'
+ bat 'dir'
+ }
+}
 
  stage('Read Excel') {
  steps {
