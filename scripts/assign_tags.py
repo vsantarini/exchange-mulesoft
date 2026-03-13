@@ -21,9 +21,11 @@ def assign_tags_and_categories(api, token, org_id):
     # Assign Categories
     categories = [c.strip() for c in api.get("categories", "").split(",") if c.strip()]
     for category in categories:
+        body = {"tagValue":[category.split(':')[1].strip()]}
         requests.put(
-            f"{base}/tags/fields/category/tags/{category}",
-            headers=headers
+            f"{base}/tags/categories/{category.split(':')[0].strip()}",
+            headers=headers,
+            json=body
         ).raise_for_status()
     print(f"✅ Categories assigned to {api['assetId']}: {categories}")
 

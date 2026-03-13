@@ -12,7 +12,9 @@ def get_existing_categories(org_id, token):
  response.raise_for_status()
  return {cat["displayName"]: cat for cat in response.json()}
 
-def create_category(category_name, org_id, token):
+def create_category(category, org_id, token):
+ category_name = category.split(':')[0].strip()
+ category_value = category.split(':')[1].strip()
  response = requests.post(
  f"{BASE_URL}/{org_id}/categories",
  headers={
@@ -21,8 +23,9 @@ def create_category(category_name, org_id, token):
  },
  json={
  "displayName": category_name,
- "acceptedValues": [],
- "allowCustomValues": True
+ "acceptedValues": [category_value],
+ "tagKey": category_name,
+ "assetTypeRestrictions": ["rest-api", "soap-api"],
  }
  )
  response.raise_for_status()
@@ -51,8 +54,8 @@ if __name__ == "__main__":
             required.add(cat)
 
  for cat in required:
-    if cat not in existing:
+    if cat.split(':')[0].strip() not in existing:
         print(f"|WARN| Category '{cat}' not found — creating it...")
         create_category(cat, args.org_id, token)
     else:
-        print(f"|OK| Category '{cat}' already exists.")
+        print(f"|OK| Category '{cat.split(':')[0].strip()}' already exists.")
