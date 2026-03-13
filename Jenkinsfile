@@ -21,13 +21,13 @@ pipeline {
 
  stage('Install Dependencies') {
 	 steps {
-	 bat 'pip install --quiet openpyxl'
-	 bat 'pip install --quiet requests'
-	 bat 'pip install --quiet openai'
-	 bat 'pip install --quiet pyyaml'
-	 bat 'pip install --quiet zeep'
-	 bat 'pip install --quiet Pillow'
-	 bat 'pip install --quiet swagger-spec-validator'
+	 bat 'python -m pip install --quiet openpyxl'
+	 bat 'python -m pip install --quiet requests'
+	 bat 'python -m pip install --quiet openai'
+	 bat 'python -m pip install --quiet pyyaml'
+	 bat 'python -m pip install --quiet zeep'
+	 bat 'python -m pip install --quiet Pillow'
+	 bat 'python -m pip install --quiet swagger-spec-validator'
 	 }
 }
 
