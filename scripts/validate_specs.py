@@ -4,7 +4,7 @@ import subprocess
 import os
 import sys
 
-SPECTRAL_BINARY = "spectral"
+SPECTRAL_BINARY = os.environ.get("SPECTRAL", "spectral")
 
 def check_spectral_installed():
     command = "where" if sys.platform == "win32" else "which"

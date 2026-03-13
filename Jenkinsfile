@@ -16,6 +16,7 @@ pipeline {
  PYTHONPATH = "C:\\Python311\\Lib;C:\\Python311\\DLLs"
  PYTHONIOENCODING       = "utf-8"
  NODE_HOME              = "C:\\Program Files\\nodejs"
+ SPECTRAL = "C:\\Users\\v.santarini\\AppData\\Roaming\\npm\\spectral.cmd"
  }
 
  stages {
