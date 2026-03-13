@@ -45,36 +45,29 @@ pipeline {
 }
 
 stage('Install Node.js') {
-    steps {
-        bat '''
-                    IF EXIST "%NODE_HOME%\\node.exe" (
-                        echo [OK] Node.js already installed.
-                    ) ELSE (
-                        echo [INFO] Installing Node.js...
-                        curl -o node-installer.msi https://nodejs.org/dist/v20.11.0/node-v20.11.0-x64.msi
-                        msiexec /i node-installer.msi /quiet /norestart
-                        echo [OK] Node.js installed.
-                    )
-                '''
-                bat '"%NODE_HOME%\\node.exe" --version'
-            }
-        }
+ steps {
+ bat '''
+ echo [INFO] Installing Node.js 20 LTS...
+ curl -o node-installer.msi https://nodejs.org/dist/v20.17.0/node-v20.17.0-x64.msi
+ msiexec /i node-installer.msi /quiet /norestart ADDLOCAL=ALL
+ echo [OK] Node.js installed.
+ '''
+ }
+}
 
 stage('Install Spectral') {
-    steps {
-                bat '''
-                    IF EXIST "%NODE_HOME%\\node_modules\\@stoplight\\spectral-cli\\bin\\spectral.js" (
-                        echo [OK] Spectral already installed.
-                    ) ELSE (
-                        echo [INFO] Installing Spectral CLI...
-                        "%NODE_HOME%\\npm.cmd" install -g @stoplight/spectral-cli
-                        echo [OK] Spectral CLI installed.
-                    )
-                '''
-                bat '"%NODE_HOME%\\npx.cmd" spectral --version'
-            }
-        }
-
+ steps {
+ bat '''
+ echo [INFO] Configuring npm prefix to avoid long path issues...
+ "C:\\Program Files\\nodejs\\npm.cmd" config set prefix "C:\\npm-global"
+ "C:\\Program Files\\nodejs\\npm.cmd" config set cache "C:\\npm-cache"
+ echo [INFO] Installing Spectral CLI...
+ "C:\\Program Files\\nodejs\\npm.cmd" install -g @stoplight/spectral-cli
+ echo [OK] Spectral CLI installed.
+ "C:\\npm-global\\spectral.cmd" --version
+ '''
+ }
+}
  stage('Read Excel') {
  steps {
 	bat '"%PYTHON%" scripts/read_input_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json --output-contracts contract-list.json'
