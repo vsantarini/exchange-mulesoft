@@ -19,6 +19,13 @@ pipeline {
  stage('Checkout') {
  steps { checkout scm }
  }
+ 
+ stage('Debug') {
+ steps {
+ bat '"%PYTHON%" --version'
+ bat '"%PYTHON%" -m pip --version'
+ }
+}
 
  stage('Install Dependencies') {
 	 steps {
