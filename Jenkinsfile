@@ -142,15 +142,21 @@ stage('Notify') {
  }
 
  post {
- success {
- echo '✅ Pipeline completed successfully.'
- }
  failure {
+ node(null) {
  bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
  }
+ }
+ success {
+ node(null) {
+ echo '[OK] Pipeline completed successfully.'
+ }
+ }
  always {
+ node(null) {
  cleanWs()
  }
  }
+}
 
 }
