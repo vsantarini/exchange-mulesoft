@@ -141,22 +141,17 @@ bat '"%PYTHON%" scripts/assign_tags.py --api-list api-list.json --token token.js
 
  // ── NUOVO ──────────────────────────────────────
  
-stage('Notify') {
+ stage('Notify') {
  steps {
- bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status success'
- }
- }
- }
-
- post {
- failure {
  script {
- bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
+ def status = currentBuild.result == null ? "success" : currentBuild.result.toLowerCase()
+ bat "\"${env.PYTHON}\" scripts/notify.py --api-list api-list.json --teams-webhook ${env.TEAMS_WEBHOOK} --email ${env.NOTIFY_EMAIL} --status ${status}"
  }
  }
- success {
- echo '[OK] Pipeline completed successfully.'
  }
+}
+
+post {
  always {
  cleanWs()
  }

@@ -41,7 +41,6 @@ def publish_asset(api, token, org_id):
     headers = {"Authorization": f"Bearer {token}"}
 
     if is_soap:
-        # Crea bundle ZIP per SOAP multi-file
         print(f"[INFO] Creating SOAP bundle for: {api['assetId']}")
         zip_path = create_soap_bundle(api)
         with open(zip_path, "rb") as f:
@@ -61,7 +60,6 @@ def publish_asset(api, token, org_id):
                 files={"file": (f"{api['assetId']}.zip", f, "application/zip")}
             )
     else:
-        # REST - upload singolo file
         with open(api["filePath"], "rb") as f:
             response = requests.post(
                 url,
@@ -78,6 +76,10 @@ def publish_asset(api, token, org_id):
                 },
                 files={"file": (main_file, f)}
             )
+
+    if response.status_code == 409:
+        print(f"[WARN] Asset already exists, skipping: {api['assetId']} v{api['version']}")
+        return
 
     response.raise_for_status()
     print(f"[OK] Published: {api['assetId']} v{api['version']}")
