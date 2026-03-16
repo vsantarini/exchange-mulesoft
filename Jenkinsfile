@@ -79,6 +79,7 @@ bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --clien
  }
  }
 
+/**
  stage('Generate AI Documentation') {
  steps {
  bat '"%PYTHON%" scripts/generate_docs.py --api-list api-list.json --openai-key %OPENAI_API_KEY% --output-dir generated-docs/'
@@ -86,6 +87,7 @@ bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --clien
  }
  }
 
+**/
  stage('Publish Assets') {
  steps {
  bat '"%PYTHON%" scripts/publish_assets.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
