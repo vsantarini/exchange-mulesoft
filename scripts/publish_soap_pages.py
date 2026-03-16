@@ -56,7 +56,7 @@ def create_or_update_page(api, page_name, content, token, org_id):
     post_response = requests.post(
         base,
         headers={**headers, "Content-Type": "application/json"},
-        json={"pageName": page_name}
+        json={"pagePath": page_name}
     )
     if post_response.status_code not in (200, 201, 409):
         post_response.raise_for_status()
@@ -76,7 +76,7 @@ def create_or_update_page(api, page_name, content, token, org_id):
     print(f"  [OK] Page content updated: {page_name}")
 
 def publish_page(api, page_name, token, org_id):
-    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal/draft/pages/{page_name}/publish"
+    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal"
     response = requests.post(
         url,
         headers={"Authorization": f"Bearer {token}"}
