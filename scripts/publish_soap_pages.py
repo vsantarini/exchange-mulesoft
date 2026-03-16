@@ -77,7 +77,7 @@ def create_or_update_page(api, page_name, content, token, org_id):
 
 def publish_page(api, page_name, token, org_id):
     url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal"
-    response = requests.post(
+    response = requests.patch(
         url,
         headers={"Authorization": f"Bearer {token}"}
     )
