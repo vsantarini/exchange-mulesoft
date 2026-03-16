@@ -3,6 +3,8 @@ import requests
 import argparse
 import os
 import xml.dom.minidom
+import time
+import sys
 
 BASE_URL = "https://anypoint.mulesoft.com/exchange/api/v2/assets"
 
@@ -29,7 +31,6 @@ def build_page_content(file_path):
     file_name = os.path.basename(file_path)
     file_type = get_file_type(file_path)
     xml_content = prettify_xml(file_path)
-
     return (
         f"# {file_type}: `{file_name}`\n\n"
         f"> This page contains the full content of the **{file_type}** "
@@ -58,7 +59,7 @@ def create_or_update_page(api, page_name, content, token, org_id):
         json={"content": content}
     )
     response.raise_for_status()
-    print(f" [OK] Page created/updated: {page_name}")
+    print(f"  [OK] Page created/updated: {page_name}")
 
 def publish_page(api, page_name, token, org_id):
     url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/pages/{page_name}/publish"
@@ -67,7 +68,7 @@ def publish_page(api, page_name, token, org_id):
         headers={"Authorization": f"Bearer {token}"}
     )
     response.raise_for_status()
-    print(f" [OK] Page published: {page_name}")
+    print(f"  [OK] Page published: {page_name}")
 
 def build_index_content(api, files_info):
     """Genera una pagina indice con la lista di tutti i WSDL/XSD."""
@@ -86,8 +87,22 @@ def build_index_content(api, files_info):
         file_type = info["fileType"]
         desc = "Entry-point" if info["isMain"] else "Dependency"
         lines.append(f"| [{file_name}]({page_name}) | `{file_type}` | {desc} |\n")
-
     return "".join(lines)
+
+def wait_for_asset(api, token, org_id, retries=6, delay=10):
+    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}"
+    for attempt in range(retries):
+        response = requests.get(
+            url,
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.status_code == 200:
+            print(f"[OK] Asset available on Exchange: {api['assetId']}")
+            return True
+        print(f"[WARN] Asset not ready, retrying in {delay}s... ({attempt + 1}/{retries})")
+        time.sleep(delay)
+    print(f"[ERROR] Asset not available after {retries} retries: {api['assetId']}")
+    return False
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -106,6 +121,9 @@ if __name__ == "__main__":
             continue
 
         print(f"\n[INFO] Processing SOAP pages for: {api['assetId']}")
+
+        if not wait_for_asset(api, token, args.org_id):
+            sys.exit(1)
 
         # Raccoglie tutti i file WSDL e XSD
         all_files = [api["filePath"]]
@@ -133,7 +151,6 @@ if __name__ == "__main__":
                 "isMain": file_path == api["filePath"]
             })
 
-        # Crea pagina indice
         if files_info:
             index_content = build_index_content(api, files_info)
             create_or_update_page(api, "service-definition", index_content, token, args.org_id)

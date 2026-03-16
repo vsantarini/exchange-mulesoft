@@ -94,6 +94,13 @@ bat '"%PYTHON%" scripts/authenticate.py --client-id %ANYPOINT_CLIENT_ID% --clien
  }
  }
  
+ stage('Wait for Exchange Propagation') {
+ steps {
+ echo '[INFO] Waiting 20 seconds for Exchange propagation...'
+ bat 'ping -n 21 127.0.0.1 > nul'
+ }
+}
+ 
  stage('Publish SOAP Definition Pages') {
  steps {
  bat '"%PYTHON%" scripts/publish_soap_pages.py --api-list api-list.json --token token.json --org-id %ANYPOINT_ORG_ID%'
