@@ -49,20 +49,34 @@ def get_page_name(file_path):
     return f"{file_type}-{base}".lower().replace("_", "-").replace(" ", "-")
 
 def create_or_update_page(api, page_name, content, token, org_id):
-    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/pages/{page_name}"
-    response = requests.put(
-        url,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        },
-        json={"content": content}
+    base = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal/draft/pages"
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Step 1 — POST: crea la pagina con il nome
+    post_response = requests.post(
+        base,
+        headers={**headers, "Content-Type": "application/json"},
+        json={"pageName": page_name}
     )
-    response.raise_for_status()
-    print(f"  [OK] Page created/updated: {page_name}")
+    if post_response.status_code not in (200, 201, 409):
+        post_response.raise_for_status()
+
+    if post_response.status_code == 409:
+        print(f"  [WARN] Page already exists, updating: {page_name}")
+    else:
+        print(f"  [OK] Page created: {page_name}")
+
+    # Step 2 — PUT: aggiorna il contenuto della pagina
+    put_response = requests.put(
+        f"{base}/{page_name}",
+        headers={**headers, "Content-Type": "text/markdown"},
+        data=content.encode("utf-8")
+    )
+    put_response.raise_for_status()
+    print(f"  [OK] Page content updated: {page_name}")
 
 def publish_page(api, page_name, token, org_id):
-    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/pages/{page_name}/publish"
+    url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal/draft/pages/{page_name}/publish"
     response = requests.post(
         url,
         headers={"Authorization": f"Bearer {token}"}
