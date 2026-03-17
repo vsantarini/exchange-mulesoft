@@ -148,7 +148,7 @@ pipeline {
 		bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step manage_contracts'
 	}
  }
- **/
+
  
   stage('Notify') {
  steps {
@@ -156,6 +156,8 @@ pipeline {
  }
  }
 }
+
+ **/
 
 post {
  failure {
