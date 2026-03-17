@@ -20,12 +20,12 @@ def notify_email(to, subject, body):
         s.send_message(msg)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--api-list", required=True)
-    parser.add_argument("--teams-webhook", required=True)
-    parser.add_argument("--email", required=True)
-    parser.add_argument("--status", required=True, choices=["success", "failure"])
-    args = parser.parse_args()
+ parser = argparse.ArgumentParser()
+ parser.add_argument("--api-list", required=True)
+ parser.add_argument("--teams-webhook", required=True)
+ parser.add_argument("--email", required=True)
+ parser.add_argument("--status", required=True, choices=["success", "failure"])
+ args = parser.parse_args()
 
     # Gestisce il caso in cui api-list.json non esiste ancora
  try:
