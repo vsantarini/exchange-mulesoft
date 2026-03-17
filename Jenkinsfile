@@ -139,6 +139,8 @@ pipeline {
 		bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step manage_applications'
 	}
  }
+ 
+ /**
 
  stage('Create Contracts') {
 	steps {
@@ -146,8 +148,7 @@ pipeline {
 		bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step manage_contracts'
 	}
  }
-
- // ── NUOVO ──────────────────────────────────────
+ **/
  
   stage('Notify') {
  steps {

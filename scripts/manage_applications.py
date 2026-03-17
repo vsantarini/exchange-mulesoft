@@ -23,6 +23,7 @@ def create_application(app, org_id, token):
             "name": app["appName"],
             "description": app.get("description", ""),
             "url": app.get("url", ""),
+            "clientId": app.get("client_id", ""),
             "redirectUri": [app["redirectUri"]] if app.get("redirectUri") else [],
             "grantTypes": [g.strip() for g in app.get("grantTypes", "client_credentials").split(",")],
             "apiEndpoints": False
