@@ -27,7 +27,7 @@ def update_home_page(api, token, org_id, docs_dir):
         url,
         headers={
             "Authorization": f"Bearer {token}",
-            "Content-Type":  "Content-Type": "text/markdown"
+            "Content-Type": "text/markdown"
         },
         json={"content": content}
     )
