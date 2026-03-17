@@ -11,30 +11,30 @@ BASE_URL = "https://anypoint.mulesoft.com/exchange/api/v2/assets"
 def rollback_publish_assets(api_list, token, org_id):
  print("[INFO] Rolling back published assets...")
  for api in api_list:
- url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}"
- response = requests.delete(
- url,
- headers={"Authorization": f"Bearer {token}"}
- )
- if response.status_code in (200, 204, 404):
- print(f" [OK] Deleted asset: {api['assetId']} v{api['version']}")
- else:
- print(f" [WARN] Could not delete asset: {api['assetId']} — HTTP {response.status_code}")
+     url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}"
+     response = requests.delete(
+     url,
+     headers={"Authorization": f"Bearer {token}"}
+     )
+     if response.status_code in (200, 204, 404):
+        print(f" [OK] Deleted asset: {api['assetId']} v{api['version']}")
+     else:
+        print(f" [WARN] Could not delete asset: {api['assetId']} — HTTP {response.status_code}")
 
 def rollback_publish_soap_pages(api_list, token, org_id):
  print("[INFO] Rolling back SOAP pages...")
  for api in api_list:
- if api.get("type") != "soap":
- continue
- url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal"
- response = requests.delete(
- url,
- headers={"Authorization": f"Bearer {token}"}
- )
- if response.status_code in (200, 204, 404):
- print(f" [OK] Deleted portal pages: {api['assetId']}")
- else:
- print(f" [WARN] Could not delete portal: {api['assetId']} — HTTP {response.status_code}")
+    if api.get("type") != "soap":
+        continue
+         url = f"{BASE_URL}/{org_id}/{api['assetId']}/{api['version']}/portal"
+         response = requests.delete(
+         url,
+         headers={"Authorization": f"Bearer {token}"}
+         )
+    if response.status_code in (200, 204, 404):
+        print(f" [OK] Deleted portal pages: {api['assetId']}")
+    else:
+        print(f" [WARN] Could not delete portal: {api['assetId']} — HTTP {response.status_code}")
 
 def rollback_manage_applications(api_list, token, org_id):
  print("[INFO] Rolling back consumer applications...")
@@ -43,20 +43,20 @@ def rollback_manage_applications(api_list, token, org_id):
  headers={"Authorization": f"Bearer {token}"}
  )
  if response.status_code != 200:
- print(f" [WARN] Could not retrieve applications — HTTP {response.status_code}")
- return
+    print(f" [WARN] Could not retrieve applications — HTTP {response.status_code}")
+    return
  apps = {app["name"]: app["id"] for app in response.json()}
  for api in api_list:
- app_name = api.get("appName")
- if app_name and app_name in apps:
- del_response = requests.delete(
- f"https://anypoint.mulesoft.com/exchange/api/v1/organizations/{org_id}/applications/{apps[app_name]}",
- headers={"Authorization": f"Bearer {token}"}
- )
- if del_response.status_code in (200, 204, 404):
- print(f" [OK] Deleted application: {app_name}")
- else:
- print(f" [WARN] Could not delete application: {app_name} — HTTP {del_response.status_code}")
+    app_name = api.get("appName")
+    if app_name and app_name in apps:
+        del_response = requests.delete(
+        f"https://anypoint.mulesoft.com/exchange/api/v1/organizations/{org_id}/applications/{apps[app_name]}",
+        headers={"Authorization": f"Bearer {token}"}
+        )
+    if del_response.status_code in (200, 204, 404):
+        print(f" [OK] Deleted application: {app_name}")
+    else:
+        print(f" [WARN] Could not delete application: {app_name} — HTTP {del_response.status_code}")
 
 # Step che non richiedono rollback remoto
 def rollback_noop(step_name):
@@ -88,26 +88,26 @@ if __name__ == "__main__":
  args = parser.parse_args()
 
  with open(args.state) as f:
- state = json.load(f)
+    state = json.load(f)
  with open(args.token) as f:
- token = json.load(f)["access_token"]
+    token = json.load(f)["access_token"]
 
  try:
- with open(args.api_list) as f:
- api_list = json.load(f)
+    with open(args.api_list) as f:
+        api_list = json.load(f)
  except Exception:
- api_list = []
- print("[WARN] api-list.json not found — rollback will be partial.")
+    api_list = []
+    print("[WARN] api-list.json not found — rollback will be partial.")
 
  completed = [s["step"] for s in state.get("completed_steps", [])]
  print(f"[INFO] Rolling back {len(completed)} completed steps in reverse order...")
 
  for step in reversed(completed):
- print(f"\n[INFO] Rollback: {step}")
- handler = ROLLBACK_MAP.get(step)
- if handler:
- handler(api_list, token, args.org_id)
- else:
- print(f"[WARN] No rollback handler found for step: {step}")
+    print(f"\n[INFO] Rollback: {step}")
+    handler = ROLLBACK_MAP.get(step)
+    if handler:
+        handler(api_list, token, args.org_id)
+    else:
+        print(f"[WARN] No rollback handler found for step: {step}")
 
  print("\n[OK] Rollback completed.")
