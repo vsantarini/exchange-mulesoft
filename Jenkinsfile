@@ -158,6 +158,7 @@ pipeline {
 }
 
  **/
+ }
 
 post {
  failure {
