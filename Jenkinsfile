@@ -8,7 +8,6 @@ pipeline {
  ANYPOINT_ORG_ID      = credentials('anypoint-org-id')
  ANYPOINT_ENV_ID      = credentials('anypoint-env-id')
  OPENAI_API_KEY       = credentials('openai-api-key')
- EXCEL_FILE          = ".\\api-catalog.xlsx"
  NOTIFY_EMAIL        = "v.santarini@reply.it"
  TEAMS_WEBHOOK       = credentials('teams-webhook-url')
  PYTHON = "C:\\Python311\\python.exe"
@@ -35,13 +34,7 @@ pipeline {
 
  stage('Install Dependencies') {
 	 steps {
-	 bat '%PYTHON% -m pip install --quiet openpyxl'
-	 bat '%PYTHON% -m pip install --quiet requests'
-	 bat '%PYTHON% -m pip install --quiet openai'
-	 bat '%PYTHON% -m pip install --quiet pyyaml'
-	 bat '%PYTHON% -m pip install --quiet zeep'
-	 bat '%PYTHON% -m pip install --quiet Pillow'
-	 bat '%PYTHON% -m pip install --quiet swagger-spec-validator'
+	 bat '"%PYTHON%" -m pip install --quiet openpyxl requests openai pyyaml zeep Pillow swagger-spec-validator'
 	 }
 }
 
@@ -168,7 +161,7 @@ post {
 	script {
 		if (fileExists('api-list.json')) {
 			bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
-			//bat "\"${env.PYTHON}\" scripts/rollback.py --state pipeline-state.json --token token.json --org-id ${env.ANYPOINT_ORG_ID}"
+			//bat '"%PYTHON%" scripts/rollback.py --state pipeline-state.json --token token.json --org-id %ANYPOINT_ORG_ID%'
 		} else {
 			bat '"%PYTHON%" scripts/notify.py --api-list api-catalog.xlsx --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
 		}
