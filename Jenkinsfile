@@ -149,7 +149,7 @@ pipeline {
 	}
  }
 
- 
+ **/ 
   stage('Notify') {
  steps {
  bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status success'
@@ -157,7 +157,7 @@ pipeline {
  }
 }
 
- **/
+
  }
 
 post {
