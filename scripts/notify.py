@@ -27,20 +27,24 @@ if __name__ == "__main__":
     parser.add_argument("--status", required=True, choices=["success", "failure"])
     args = parser.parse_args()
 
+    # Gestisce il caso in cui api-list.json non esiste ancora
+ try:
     with open(args.api_list) as f:
         apis = json.load(f)
-
     names = ", ".join([a["name"] for a in apis])
-    status_label = "SUCCESS" if args.status == "success" else "FAILURE"
-    msg = (
-        f"[{status_label}] Exchange CI/CD Pipeline\n"
-        f"APIs processed: {names}"
-    )
+ except Exception:
+    names = "unknown (api-list not available)"
 
-    notify_teams(args.teams_webhook, msg)
-    notify_email(
-        args.email,
-        f"[Exchange CI/CD] Pipeline {status_label}",
-        msg
-    )
-    print("[OK] Notifications sent.")
+ status_label = "SUCCESS" if args.status == "success" else "FAILURE"
+ msg = (
+ f"[{status_label}] Exchange CI/CD Pipeline\n"
+ f"APIs processed: {names}"
+ )
+
+ notify_teams(args.teams_webhook, msg)
+ notify_email(
+ args.email,
+ f"[Exchange CI/CD] Pipeline {status_label}",
+ msg
+ )
+ print("[OK] Notifications sent.")

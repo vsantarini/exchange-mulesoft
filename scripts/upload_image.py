@@ -11,7 +11,7 @@ def upload_image(api, token, org_id):
 
     url = (
         f"https://anypoint.mulesoft.com/exchange/api/v2/assets"
-        f"/{org_id}/{api['assetId']}/{api['version']}/resources"
+        f"/{org_id}/{api['assetId']}/{api['version']}/portal/draft/resources"
     )
     image_name = os.path.basename(image_path)
 

@@ -5,9 +5,9 @@ import argparse
 def publish_page(api, token, org_id):
     url = (
         f"https://anypoint.mulesoft.com/exchange/api/v2/assets"
-        f"/{org_id}/{api['assetId']}/{api['version']}/pages/home/publish"
+        f"/{org_id}/{api['assetId']}/{api['version']}/portal"
     )
-    response = requests.post(
+    response = requests.patch(
         url,
         headers={"Authorization": f"Bearer {token}"}
     )

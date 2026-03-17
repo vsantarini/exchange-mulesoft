@@ -21,13 +21,13 @@ def update_home_page(api, token, org_id, docs_dir):
 
     url = (
         f"https://anypoint.mulesoft.com/exchange/api/v2/assets"
-        f"/{org_id}/{api['assetId']}/{api['version']}/pages/home"
+        f"/{org_id}/{api['assetId']}/{api['version']}/portal/draft/pages/home"
     )
     response = requests.put(
         url,
         headers={
             "Authorization": f"Bearer {token}",
-            "Content-Type":  "application/json"
+            "Content-Type":  "Content-Type": "text/markdown"
         },
         json={"content": content}
     )

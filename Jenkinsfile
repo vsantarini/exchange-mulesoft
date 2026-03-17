@@ -141,17 +141,23 @@ bat '"%PYTHON%" scripts/assign_tags.py --api-list api-list.json --token token.js
 
  // ── NUOVO ──────────────────────────────────────
  
- stage('Notify') {
+  stage('Notify') {
  steps {
- script {
- def status = currentBuild.result == null ? "success" : currentBuild.result.toLowerCase()
- bat "\"${env.PYTHON}\" scripts/notify.py --api-list api-list.json --teams-webhook ${env.TEAMS_WEBHOOK} --email ${env.NOTIFY_EMAIL} --status ${status}"
- }
+ bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status success'
  }
  }
 }
 
 post {
+ failure {
+ script {
+ if (fileExists('api-list.json')) {
+ bat "\"${env.PYTHON}\" scripts/notify.py --api-list api-list.json --teams-webhook ${env.TEAMS_WEBHOOK} --email ${env.NOTIFY_EMAIL} --status failure"
+ } else {
+ bat "\"${env.PYTHON}\" scripts/notify.py --api-list api-catalog.xlsx --teams-webhook ${env.TEAMS_WEBHOOK} --email ${env.NOTIFY_EMAIL} --status failure"
+ }
+ }
+ }
  always {
  cleanWs()
  }
