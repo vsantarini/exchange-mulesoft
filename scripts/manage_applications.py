@@ -13,8 +13,27 @@ def get_existing_apps(org_id, token):
     return {app["name"]: app for app in response.json()}
 
 def create_application(app, org_id, token):
-    response = requests.post(
+    response_create = requests.post(
         f"{BASE_URL}/{org_id}/applications",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "name": app["appName"],
+            "description": app.get("description", ""),
+            "url": app.get("url", ""),
+            "redirectUri": [app["redirectUri"]] if app.get("redirectUri") else [],
+            "grantTypes": [g.strip() for g in app.get("grantTypes", "client_credentials").split(",")],
+            "apiEndpoints": False
+        }
+    )
+    response_create.raise_for_status()
+    result = response_create.json()
+    print(f"[OK] Created app: {app['appName']} (id: {result['id']})")
+    
+    response_update = requests.post(
+        f"{BASE_URL}/{org_id}/applications/{result['id']}",
         headers={
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"
@@ -29,9 +48,10 @@ def create_application(app, org_id, token):
             "apiEndpoints": False
         }
     )
-    response.raise_for_status()
-    result = response.json()
-    print(f"[OK] Created app: {app['appName']} (id: {result['id']})")
+    response_update.raise_for_status()
+    result_upd = response_update.json()
+    print(f"[OK] Updated app: {app['appName']} (id: {result_upd['id']}), (client_id: {result_upd['clientId']})")
+    
     return result
 
 def update_application(app_id, app, org_id, token):
@@ -44,7 +64,8 @@ def update_application(app_id, app, org_id, token):
         json={
             "name": app["appName"],
             "description": app.get("description", ""),
-            "url": app.get("url", "")
+            "url": app.get("url", ""),
+            "clientId": app.get("clientId", "")
         }
     )
     response.raise_for_status()
