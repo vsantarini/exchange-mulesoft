@@ -158,8 +158,6 @@ pipeline {
 }
 
 
- }
-
 post {
  failure {
 	script {
