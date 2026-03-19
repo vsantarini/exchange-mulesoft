@@ -26,7 +26,6 @@ if __name__ == "__main__":
 
  apis = read_sheet(wb[SHEET_APIS])
  apps = read_sheet(wb[SHEET_APPS])
- contracts = read_sheet(wb[SHEET_CONTRACTS])
 
  with open(args.output_apis, "w") as f:
     json.dump(apis, f, indent=2)
