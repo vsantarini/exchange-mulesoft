@@ -1,0 +1,76 @@
+functions:
+    - axa-check-english-param
+    - axa-check-english-desc
+
+rules:
+
+   axa-header-parameter-not-english:
+    type: validation
+    description: Checks that the header parameters are in english
+    given: $..parameters[?(@.in === 'header')][name]
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-param
+    
+   axa-resource-not-english:
+    type: validation
+    description: Checks that the resources are in english
+    given: $..paths.*~  
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-param
+      
+   axa-query-parameter-not-english:
+    type: validation
+    description: Checks that the query parameters are in english
+    given: $..parameters[?(@.in === 'query')][name]
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-param
+
+   axa-path-parameter-not-english:
+    type: validation
+    description: Checks that the path parameters are in english
+    given: $..parameters[?(@.in === 'path')][name]
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-param       
+
+   axa-description-not-english:
+    type: validation
+    description: Checks that the descriptions are in english
+    given: $..description
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-desc
+
+   axa-summary-not-english:
+    type: validation
+    description: Checks that the summaries are in english
+    given: $..summary
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-desc         
+      
+   axa-schema-not-english:
+    type: validation
+    description: Checks that parameters in schemas are in english
+    given: $..properties.*~
+    message: '{{error}}'
+    severity: error
+    recommended: true
+    then:
+      function: axa-check-english-param       
+    

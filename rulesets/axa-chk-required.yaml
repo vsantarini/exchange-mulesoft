@@ -1,0 +1,17 @@
+functions:
+  - axa-chkrequired
+
+rules:
+  axa-request-check-required:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: If the parameter is required it must be declared inside the request body.
+    message: "{{error}}"
+    given: "$"
+    then:
+      function: axa-chkrequired
+
+
+ 

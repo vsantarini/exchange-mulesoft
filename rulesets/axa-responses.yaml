@@ -1,0 +1,118 @@
+functions:
+  - axa-additional404OnFullyAsynchronousEndpoint
+
+rules:
+  axa-response-400-mandatory:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Any operation must define the 400 response.
+    message: "The request must define a 400 response."
+    given: "$.paths..responses"
+    then:
+      field: "400"
+      function: truthy
+
+  axa-response-401-mandatory-for-security:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Any authenticated operation must define the 401 response.
+    message: "The request with security must define a 401 response."
+    given: "$.paths.*[?(@.security)].responses"
+    then:
+      field: "401"
+      function: truthy
+
+  axa-response-403-mandatory-for-security:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Any authenticated operation must define the 403 response.
+    message: "The request with security must define a 403 response."
+    given: "$.paths.*[?(@.security)].responses"
+    then:
+      field: "403"
+      function: truthy
+
+  axa-response-404-mandatory-for-id:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: "Any operation must define the 404 response when it includes a resource identifier and is synchronous."
+    message: "The request must define a 404 response when it includes a resource identifier and is synchronous."
+    given: "$.paths[?(@property.includes('}'))][?(['get', 'post', 'delete', 'options', 'patch'].includes(@property))].responses[?(@property.startsWith('2') && (@property !== '202'))]^"
+    then:
+      field: "404"
+      function: truthy
+
+  axa-response-404-mandatory-for-id-put:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: The PUT request, must define the 404 response when it includes a sub-resource and is not asynchronous.
+    message: "The PUT request, must define the 404 response when it includes a sub-resource and is synchronous."
+    given: "$.paths[?(@property.includes('}/'))][?(@property === 'put')].responses[?(@property.startsWith('2') && (@property !== '202'))]^"
+    then:
+      field: "404"
+      function: truthy
+
+  axa-response-404-only-for-id:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Operation must not define the 404 response when it not includes a ressource identifier.
+    message: "The request must not define a 404 response if there is no path parameters."
+    given: "$.paths[?(!@property.includes('}'))].*.responses"
+    then:
+      field: "404"
+      function: falsy
+      #TODO : fix error message
+
+  axa-response-404-only-for-synchronous:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Operation must not define the 404 response when it is fully asynchronous.
+    message: "A fully asynchronous API must not define a 404 response."
+    given: "$.paths[?(@property.includes('}'))][?(['post', 'delete', 'patch', 'put'].includes(@property))]"
+    then:
+      field: responses
+      function: axa-additional404OnFullyAsynchronousEndpoint
+    # TODO : don't report the error. why ? regex?
+
+  axa-response-204-empty-content:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A response 204 (No Content) must not define any content.
+    message: "A response 204 (No Content) must not define any content."
+    given: "$.paths.*.*.responses.204"
+    then:
+      field: content
+      function: falsy
+     #TODO : fix error message
+
+
+  axa-response-200-content:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: |
+      A response 200 (OK) must define a content as defined in https://tools.ietf.org/html/rfc7231#section-6.3.1 with:
+      Aside from responses to CONNECT, a 200 response always has a payload, though an origin server MAY generate a payload body of zero length.
+      If no payload is desired, an origin server ought to send 204 (No Content) instead.
+    message: "A response 200 (OK) must define a content."
+    given: "$.paths.*.*.responses.200"
+    then:
+      field: content
+      function: truthy

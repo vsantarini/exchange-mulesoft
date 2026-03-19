@@ -1,0 +1,16 @@
+extends:
+  - ./axa-paths.yaml
+  - ./axa-it-info-version-format.yaml
+  - ./axa-responses.yaml
+  - ./axa-http-verb-and-status.yaml
+  - ./axa-remote-locations.yaml
+  - ./axa-documentation.yaml
+  - ./axa-iso-codes.yaml
+ # - ./axa-payload-mime-types.yaml
+  - ./axa-security_scheme.yaml
+  - ./axa-it-plural-resource-format.yaml
+  - ./axa-authorization_header.yaml
+  - ./axa-date-checker.yaml
+  - ./axa-it-case.yaml
+  - ./axa-it-english-checker.yaml
+#  - [spectral:oas, all]

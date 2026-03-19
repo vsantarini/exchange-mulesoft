@@ -1,0 +1,4 @@
+extends:
+  - ./axa-payload-mime-types.yaml
+  - "@stoplight/spectral-owasp-ruleset"
+#manca cache control e pagination  

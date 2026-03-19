@@ -1,0 +1,38 @@
+rules:
+
+  axa-schema-arrays-maxItems:
+    type: validation
+    severity: warn
+    recommended: true
+    formats: ["oas3"]
+    description: "Array typed properties must be further described using 'maxItems'"
+    message: "Array typed properties must have 'maxItems'."
+    given: $..*[?(@.type === 'array')]
+    then:
+      field: maxItems
+      function: truthy
+
+  axa-schema-arrays-minItems:
+    type: validation
+    severity: warn
+    recommended: true
+    formats: ["oas3"]
+    description: "Array typed properties must be further described using 'minItems'"
+    message: "Array typed properties must have 'minItems'."
+    given: $..*[?(@.type === 'array')]
+    then:
+      field: minItems
+      function: defined
+
+
+  axa-schema-strings-maxLength:
+    type: validation
+    severity: warn
+    recommended: true
+    formats: ["oas3"]
+    description: "String typed properties must be further described using 'maxLength'."
+    message: "String typed properties must have 'maxLength'."
+    given: $..*[?(@.type === 'string' && !(@.format === 'date' || @.format === 'date-time' || @.format === 'email' || @.enum))]
+    then:
+      field: maxLength
+      function: truthy

@@ -1,0 +1,145 @@
+functions:
+ - axa-casing
+ - axa-pattern 
+rules:
+  # defined style:
+  #
+  # headerParameters : kebab-case or Caps-Kebab-Case
+  # queryParameters : kebab-case
+  #
+  # pathSegments : kebab-case
+  #
+  # propertyNames : kebab-case
+  # enumValues : MACRO_CASE
+  #
+  # OAS internal object style:
+  # pathParameters : kebab-case
+  # schemaKeys : PascalCase
+  # operationId : camelCase
+
+
+# error message format:
+# WHAT 'name': must be xxx case
+
+# TODO : add test for request schema too
+
+
+  axa-header-parameter-names-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the header should be written in kebab-case
+    message: "Header parameter {{error}}"
+    given: $..parameters[?(@.in === 'header')][name]
+    then:
+      function: axa-pattern
+      functionOptions:
+        pattern: '^((([a-z][a-z0-9]*(?:-[a-z0-9]+)*)*)|(([A-Z][a-z0-9]*(?:-[A-Z][a-z0-9]*)*)*))$'
+        # test value: valid:
+        # x-axa-context
+        # x-axa-a-context
+        # Accept-Language
+        # Header-A-Valid
+        # test value: invalid:
+        # Header-b-Invalid
+        # Header-B-inValid
+        # Header-B-InValid-
+        # header-b-invalid-
+        # -header-b-invalid
+        # -Header-B-Invalid
+
+  axa-query-parameter-names-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the query should be written in kebab-case
+    message: "Query parameter {{error}}"
+    given: $..parameters[?(@.in === 'query')][name]
+    then:
+      function: axa-casing
+      functionOptions:
+        type: kebab
+
+  axa-path-segment-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A path should written in kebab-case.
+    message: "Path {{error}}"
+    given: $.paths.*~[name]
+    then:
+      function: axa-pattern
+      functionOptions:
+        pattern: '^(\/([a-z][a-z0-9]*(?:-[a-z0-9]+)*|\{[^\}]*\})*)*$'
+        # regex ~= ( /kebab-case | /{WHAT-EVER-CASE-PARAM} ) *
+        # (path parameter case is tested by path-parameter-names-kebab-case rule)
+
+        # Regex test vector:
+        #
+        # Valid:
+        #/this/path/h-as/no-case-issues
+        #/this/path/h-as/{Z_Z}/no-case-issues
+        #/this/path/h-as/{Z_Z}/ISSSUE/{Z_Z}/end-path
+        # not a case issue, so valid for this rule:
+        #/this/path/can/end-with-slash/
+        #/this/path/can/have//extra-slash
+        # not valid:
+        #/this/path/hAs/case_issues
+        #/this/path/has/{AAA_XX}/case_issues
+
+  axa-property-names-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Property names should be written in kebab-case
+    message: "Property {{error}}"
+    given: $..properties.*~
+    # TODO: don't catch case-issue-4of12 (oneOf in responses schema)
+    # TODO: report components.schemas.Heterogen.oneOf[1], why ?
+    then:
+      function: axa-casing
+      functionOptions:
+        type: kebab
+
+  axa-enum-names-macro-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Enum const names should be written in MACRO_CASE
+    message: "Enum value {{error}}"
+    given: "$..enum.*"
+    then:
+      function: axa-casing
+      functionOptions:
+        type: macro
+
+  axa-path-parameter-names-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the path should be written in kebab-case
+    message: "Path parameter {{error}}"
+    given: $..parameters[?(@.in === 'path')][name]
+    then:
+      function: axa-casing
+      functionOptions:
+        type: kebab
+
+  #axa-operationId-names-kebab-case:
+    #type: style
+    #severity: error
+    #recommended: true
+    #formats: ["oas3"]
+    #description: An operationId name should be kebab-case
+    #message: "OperationId {{error}}"
+    #given: $..operationId
+    #then:
+      #function: axa-casing
+      #functionOptions:
+        #type: kebab

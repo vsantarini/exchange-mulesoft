@@ -1,0 +1,12 @@
+extends:
+  - ./axa-info-version-format.yaml
+  - ./axa-case.yaml
+  - ./axa-paths.yaml
+  - ./axa-responses.yaml
+  - ./axa-http-verb-and-status.yaml
+  - ./axa-remote-locations.yaml
+  - ./axa-schema.yaml
+  - ./axa-documentation.yaml
+  - ./axa-iso-codes.yaml
+
+#TODO : test with oas2

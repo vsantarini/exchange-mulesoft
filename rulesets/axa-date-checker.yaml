@@ -1,0 +1,24 @@
+functions:
+  - axa-date-checker
+rules:
+# TODO : review : don't catch most of the error in the test file.
+  axa-date-checker:
+    description: Checks the properties of a date attribute
+    given: '$.components.schemas.*.properties'
+    message: '{{error}}'
+    severity: warn
+    then:
+      function: axa-date-checker
+      functionOptions: 
+        dateOnlyWhitelist: 
+            - birthdate 
+            - birthday 
+            - dueDate 
+            - expiryDate 
+            - expirationDate 
+        blacklist: 
+            - mandate 
+            - candidate 
+            - update 
+            - updated 
+            - validation

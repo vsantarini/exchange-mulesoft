@@ -1,0 +1,41 @@
+functions:
+  - axa-blocklist-resource
+  - axa-blocklist
+rules:
+
+  axa-properties-name-blocklist:
+    description: Properties name blocklist
+    given: '$..properties.*~'
+    message: '{{error}}'
+    recommended: true
+    type: style
+    severity: warn
+    then:
+      function: axa-blocklist
+      functionOptions:
+        blocklist: [sex, blacklist, whitelist, master, slave]
+
+  axa-resource-names-blocklist:
+    description: Ressource name blocklist
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    type: style
+    severity: warn
+    then:
+      function: axa-blocklist-resource
+      functionOptions:
+        blocklist: [health, blacklist, whitelist, master, slave]
+
+  axa-format-blocklist:
+    description: Ressource format blocklist
+    given: '$..properties.*.format'
+    message: '{{error}}'
+    recommended: true
+    type: style
+    severity: warn
+    then:
+      function: axa-blocklist
+      functionOptions:
+        blocklist: ["datetime"]
+        # datetime is a typo of date-time

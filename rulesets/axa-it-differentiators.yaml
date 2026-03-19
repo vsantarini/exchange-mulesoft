@@ -1,0 +1,10 @@
+extends:
+  - ./axa-iso-codes.yaml
+  - ./axa-security_scheme.yaml
+  - ./axa-it-plural-resource-format.yaml
+  - ./axa-authorization_header.yaml
+  - ./axa-date-checker.yaml
+  - ./axa-it-case.yaml
+# - ./axa-currency.yaml
+#manca currency, duration, amount, enumeration, 
+#manca testing e deprecation (?)  

@@ -1,0 +1,13 @@
+rules:
+  axa-invalid-security-scheme-type:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: "Only 'oauth2' securityScheme type is allowed"
+    given: "$.components.securitySchemes.*.type"
+    then:
+      function: enumeration
+      functionOptions:
+        values:
+          - oauth2

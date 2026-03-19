@@ -1,0 +1,29 @@
+rules:
+
+  axa-description-starts-with-uppercase:
+    type: style
+    severity: warn
+    recommended: true
+    formats: ["oas3"]
+    description: Description must not start with lowercase.
+    message: "Description must not starts with a lowercase"
+    given: $..description
+    then:
+      fields: "@key"
+      function: pattern
+      functionOptions:
+        notMatch: ^[a-z]
+
+  axa-summary-starts-with-uppercase:
+    type: style
+    severity: warn
+    recommended: true
+    formats: ["oas3"]
+    description: Summary must not start with lowercase.
+    message: "Summary must not starts with a lowercase"
+    given: $..summary
+    then:
+      fields: "@key"
+      function: pattern
+      functionOptions:
+        notMatch: ^[a-z]

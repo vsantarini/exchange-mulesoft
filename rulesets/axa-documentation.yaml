@@ -1,0 +1,27 @@
+rules:
+
+  axa-attribute-description-mandatory:
+    description: Every resource attribute must have a description
+    type: style
+    formats: [oas3]
+    severity: error
+    message: "Missing description"
+    recommended: false #//TODO : report schema, why?
+    given: ["$..properties[*]","$.paths[*]","$.components.*.[*]"]
+    then:
+      - field: "description"
+        function: truthy
+
+  axa-attribute-example-mandatory:
+    description: Every resource attribute must have an example
+    type: style
+    formats: [oas3]
+    severity: warn
+    recommended: false #//TODO : report schema, why?
+    message: "Missing an example"
+    given: '$..properties[*]'
+    then:
+      - field: "example"
+        function: truthy
+
+    #TODO : add a test for Schema of type!=object

@@ -1,0 +1,14 @@
+functions:
+    - axa-iso-codes-regex
+
+rules:
+
+   axa-iso-codes-regex:
+    type: validation
+    description: Checks that any field description using iso code include a regex in the field definition
+    given: [$..properties]
+    message: '{{error}}'
+    severity: hint
+    recommended: true
+    then:
+      function: axa-iso-codes-regex

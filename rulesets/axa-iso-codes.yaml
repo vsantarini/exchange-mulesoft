@@ -1,0 +1,52 @@
+functions:
+  - axa-iso-codes_no-files
+  - axa-iso-codes-regex
+
+rules:
+
+  axa-iso-4217:
+    description: Checks properties using ISO 4217 (currency 3 letters code).
+    given: ['$..properties[*]']
+    message: '{{error}}'
+    severity: hint
+    type: validation
+    recommended: true
+    then:
+      function: axa-iso-codes_no-files
+      functionOptions:
+        iso_code: "4217"
+
+
+  axa-iso-639:
+    description: Checks properties using ISO 639 (language 2 letters code).
+    given: ['$..properties[*]']
+    message: '{{error}}'
+    severity: hint
+    type: validation
+    recommended: true
+    then:
+      function: axa-iso-codes_no-files
+      functionOptions:
+        iso_code: "639"
+
+  axa-iso-3166:
+    description: Checks properties using ISO 3166-1 (country 2 letters code).
+    given: ['$..properties[*]']
+    message: '{{error}}'
+    severity: hint
+    type: validation
+    recommended: true
+    then:
+      function: axa-iso-codes_no-files
+      functionOptions:
+        iso_code: "3166"
+  
+  axa-iso-codes-regex:
+    type: validation
+    description: Checks that any field description using iso code include a regex in the field definition
+    given: [$..properties]
+    message: '{{error}}'
+    severity: hint
+    recommended: true
+    then:
+      function: axa-iso-codes-regex     

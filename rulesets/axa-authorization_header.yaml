@@ -1,0 +1,54 @@
+rules:
+
+  axa-missing-security-on-resource:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Any authenticated operation must define the authorization header
+    message: "Authorization header must be associated to the resource: {{error}}"
+    given:
+        - "$.paths[*].get"
+        - "$.paths[*].put"
+        - "$.paths[*].post"
+        - "$.paths[*].delete"
+        - "$.paths[*].patch"
+        - "$.paths[*].options"
+        - "$.paths[*].head"
+        - "$.paths[*].trace"
+    then:
+        field: security 
+        function: defined 
+        message: Operation must define "security"
+
+  axa-missing-securityScheme:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Any authenticated operation must define the authorization header
+    message: "SecurityScheme clientCredentials or type Bearer must be defined: {{error}}"
+    given: "$.components.securitySchemes[*]"
+    then:
+        function: schema 
+        functionOptions: 
+            schema: 
+              anyOf: 
+               - type: object 
+                 required: [type, scheme] 
+                 properties: 
+                    type: { const: http } 
+                    scheme: { const: bearer } 
+               - type: object 
+                 required: [type, flows] 
+                 properties: 
+                    type: { const: oauth2 } 
+                    flows: 
+                      type: object 
+                      required: [clientCredentials] 
+                      properties: 
+                        clientCredentials: 
+                            type: object
+                
+                
+              

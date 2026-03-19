@@ -1,0 +1,11 @@
+functions:
+  - require-ap-false-in-requestbody
+
+rules:
+  requestbody-additionalProperties-false:
+    description: "POST/PUT/PATCH requestBody schemas must declare additionalProperties: false (inline or via $ref)."
+    message: "{{path}} requestBody schema must have additionalProperties: false (inline or in referenced schema)."
+    severity: error
+    given: "$.paths"
+    then:
+      function: require-ap-false-in-requestbody

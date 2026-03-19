@@ -1,0 +1,13 @@
+rules:
+
+  axa-info-version-format:
+    type: validation
+    description: OAS file version must follow the pattern
+    given: '$.info.version'
+    message: "$.info.version '{{value}}' : {{error}}"
+    recommended: true
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: "^\\d+.\\d+.\\d+$"

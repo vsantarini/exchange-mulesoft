@@ -1,0 +1,16 @@
+functions:
+ - axa-admitted-headers
+
+rules: 
+    axa-admitted-header-parameter:
+       type: validation
+       severity: error
+       recommended: true
+       formats: ["oas3"]
+       description: Only a limited set of header parameters is accepted in AXA
+       message: "{{error}}"
+       given: $..parameters[?(@.in == 'header')][name]
+       then:
+         function: axa-admitted-headers
+         functionOptions:
+           allowedHeaders: [Authorization, x-axa-context, X-Axa-Apikey, x-Gateway-APIKey, X-Axa-InitialMsgId, Accept, Accept-Language, Content-type, Content-Language, Origin, Content-Disposition, Content-Length, Range, Cache-Control, If-None-Match]

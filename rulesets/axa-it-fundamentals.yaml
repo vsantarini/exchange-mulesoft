@@ -1,0 +1,12 @@
+extends:
+  - "spectral:oas"
+  - ./axa-paths.yaml
+  - ./axa-it-info-version-format.yaml
+  - ./axa-responses.yaml
+  - ./axa-http-verb-and-status.yaml
+  - ./axa-remote-locations.yaml
+  - ./axa-documentation.yaml
+  - ./axa-admitted-header-parameter.yaml
+  - ./axa-it-english-checker.yaml
+  - ./axa-chk-required.yaml
+  - ./axa-it-additional-properties.yaml

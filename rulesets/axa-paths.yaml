@@ -1,0 +1,13 @@
+rules:
+  axa-path-keys-no-multiple-consecutive-slashes:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    message: "Path must not contain multiple consecutive forward slashes"
+    description: "Path must not contain multiple consecutive forward slashes"
+    given: "$.paths.*~"
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "/\/{2,}/"

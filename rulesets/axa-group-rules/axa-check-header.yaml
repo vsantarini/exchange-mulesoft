@@ -1,0 +1,16 @@
+functions:
+  - axa-permitted-headers
+
+rules:
+
+  axa-check-header:
+    description: Checks that header parameter is within the ones permitted by AXA IT.
+    given: $..parameters[?(@.in === 'header')][name]
+    message: '{{error}}'
+    severity: hint
+    type: validation
+    recommended: true
+    then:
+      function: axa-permitted-headers
+      functionOptions:
+        iso_code: "4217"

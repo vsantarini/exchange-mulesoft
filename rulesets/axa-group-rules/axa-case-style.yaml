@@ -1,0 +1,162 @@
+rules:
+  # defined style:
+  #
+  # headerParameters : kebab-case or Caps-Kebab-Case
+  # queryParameters : snake_case
+  #
+  # pathSegments : kebab-case
+  #
+  # propertyNames : snake_case
+  # enumValues : MACRO_CASE
+  #
+  # OAS internal object style:
+  # pathParameters : snake_case
+  # schemaKeys : PascalCase
+  # operationId : camelCase
+
+
+# error message format:
+# WHAT 'name': must be xxx case
+
+# TODO : add test for request schema too
+
+
+  axa-header-parameter-names-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the header should be written in kebab-case or Caps-Kebab-Case
+    message: "Header parameter '{{value}}': is not kebab-case nor Caps-Kebab-Case"
+    given: $..parameters[?(@.in === 'header')]
+    then:
+      field: name
+      function: pattern
+      functionOptions:
+        match: ^((([a-z][a-z0-9]*(?:-[a-z0-9]+)*)*)|(([A-Z][a-z0-9]*(?:-[A-Z][a-z0-9]*)*)*))$
+        # test value: valid:
+        # x-axa-context
+        # x-axa-a-context
+        # Accept-Language
+        # Header-A-Valid
+        # test value: invalid:
+        # Header-b-Invalid
+        # Header-B-inValid
+        # Header-B-InValid-
+        # header-b-invalid-
+        # -header-b-invalid
+        # -Header-B-Invalid
+
+  axa-query-parameter-names-snake-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the query should be written in snake_case
+    message: "Query parameter '{{value}}': {{error}}"
+    given: $..parameters[?(@.in === 'query')]
+    then:
+      field: name
+      function: casing
+      functionOptions:
+        type: snake
+
+  axa-path-segment-kebab-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A path should written in kebab-case.
+    message: "Path : must be composed of kebab-case segment"
+    given: $.paths.*~
+    then:
+      field: name
+      function: pattern
+      functionOptions:
+        match: ^(\/([a-z][a-z0-9]*(?:-[a-z0-9]+)*|\{[^\}]*\})*)*$
+        # regex ~= ( /kebab-case | /{WHAT-EVER-CASE-PARAM} ) *
+        # (path parameter case is tested by path-parameter-names-snake-case rule)
+
+        # Regex test vector:
+        #
+        # Valid:
+        #/this/path/h-as/no-case-issues
+        #/this/path/h-as/{Z_Z}/no-case-issues
+        #/this/path/h-as/{Z_Z}/ISSSUE/{Z_Z}/end-path
+        # not a case issue, so valid for this rule:
+        #/this/path/can/end-with-slash/
+        #/this/path/can/have//extra-slash
+        # not valid:
+        #/this/path/hAs/case_issues
+        #/this/path/has/{AAA_XX}/case_issues
+
+  axa-property-names-snake-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Property names should be written in snake_case
+    message: "Property '{{property}}': {{error}}"
+    given: [
+     "$..properties.*~"
+    # TODO: don't catch case-issue-4of12 (oneOf in responses schema)
+    # TODO: report components.schemas.Heterogen.oneOf[1], why ?
+    ]
+    then:
+      function: casing
+      functionOptions:
+        type: snake
+
+  axa-enum-names-macro-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Enum const names should be written in MACRO_CASE
+    message: "Enum value '{{value}}': {{error}}"
+    given: "$..enum.*"
+    then:
+      function: casing
+      functionOptions:
+        type: macro
+
+  axa-path-parameter-names-snake-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A parameter in the path should be written in snake_case
+    message: "Path parameter '{{value}}': {{error}}"
+    given: $..parameters[?(@.in === 'path')]
+    then:
+      field: name
+      function: casing
+      functionOptions:
+        type: snake
+
+  axa-schema-names-pascal-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Schema names should be written in PascalCase
+    message: "Schema '{{property}}': {{error}}"
+    given: "$.components.schemas.*~"
+    then:
+      function: casing
+      functionOptions:
+        type: pascal
+
+  axa-operationId-names-camel-case:
+    type: style
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: An operationId name should be camelCase
+    message: "OperationId '{{value}}': {{error}}"
+    given: $..operationId
+    then:
+      field: name
+      function: casing
+      functionOptions:
+        type: camel

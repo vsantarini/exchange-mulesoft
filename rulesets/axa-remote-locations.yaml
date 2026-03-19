@@ -1,0 +1,14 @@
+rules:
+  axa-secure-remote-reference-location:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    message: "Access to remote references MUST be done through a secured channel."
+    description: "Access to remote references MUST be done through a secured channel."
+    resolved: false
+    given: "$..['$ref']"
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "^http:"

@@ -1,0 +1,16 @@
+functions:
+  - axa-check-plurals
+  
+rules:
+
+  axa-it-plural-resource-format:
+    type: validation
+    description: Literal resource segments in paths should be plural unless they are verbs
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: error
+    then:
+      function: axa-check-plurals
+      functionOptions:
+        checkIntermediates: true

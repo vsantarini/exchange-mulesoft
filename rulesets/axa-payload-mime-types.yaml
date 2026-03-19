@@ -1,0 +1,33 @@
+rules:
+
+  axa-response-content-is-json:
+    type: validation
+    severity: hint
+    recommended: true
+    formats: ["oas3"]
+    message: "Response content type is not 'application/json'."
+    given: $.paths.*.*.responses.*.content
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "^application\/json"
+        # valid:
+        # application/json
+        # application/json; charset=utf-8
+
+  axa-request-body-is-json:
+    type: validation
+    severity: hint
+    recommended: true
+    formats: ["oas3"]
+    message: "Request body type is not 'application/json'."
+    given: $.paths.*.*.requestBody.content
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "^application\/json"
+        # valid:
+        # application/json
+        # application/json; charset=utf-8

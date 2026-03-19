@@ -40,7 +40,7 @@ pipeline {
 
  stage('Read Excel') {
  steps {
-	bat '"%PYTHON%" scripts/read_input_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json --output-contracts contract-list.json'
+	bat '"%PYTHON%" scripts/read_input_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json'
 	bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step read_excel'
  }
  }

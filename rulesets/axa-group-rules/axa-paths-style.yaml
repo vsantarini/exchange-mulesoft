@@ -1,0 +1,53 @@
+functions:
+  - axa-limit-number-of-subresources
+  - axa-limit-number-of-parameters-in-path
+  - axa-check-plurals
+
+rules:
+  # can I replace this by a regex ?
+  axa-limit-number-of-parameters-in-path:
+    description: Limit the number of parameters in a resource path
+    type: style
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: warn
+    then:
+      function: axa-limit-number-of-parameters-in-path
+      functionOptions:
+        limit: 2
+
+  axa-limit-number-of-subresources:
+    type: style
+    description: Limit the number of subresources in path (including paramter)
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: warn
+    then:
+      function: axa-limit-number-of-subresources
+      functionOptions:
+        limit: 5
+
+  axa-path-with-version:
+    type: style
+    severity: error
+    recommended: false
+    formats: ["oas3"]
+    message: "Path must contains a version."
+    given: "$.paths"
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "/\/(vexp|v[1-9]([0-9]+)?)\//"
+
+  axa-it-plural-resource-format:
+    type: validation
+    description: Resources must be plural
+    given: '$.paths.*~'
+    message: '{{error}}'
+    recommended: true
+    severity: error
+    then:
+      function: axa-check-plurals     

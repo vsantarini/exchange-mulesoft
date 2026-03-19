@@ -1,0 +1,14 @@
+functions:
+  - axa-check-currency
+
+rules:
+  amount-currency-pair:
+    description: >
+      If a schema contains a property with 'amount' in its name,
+      it must also contain a property called 'currency-code'
+      following ISO 4217 (3 uppercase letters).
+    message: "{{error}}"
+    given: "$..[?(@.properties)]"   # Applies to all schemas with properties
+    then:
+      function: axa-check-currency
+    severity: warn

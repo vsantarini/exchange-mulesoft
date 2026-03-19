@@ -1,0 +1,68 @@
+functions:
+    - axa-http-allowed-codes-and-verbs
+    - axa-http-verb-body-allowed
+    - axa-http-verb-query-allowed
+
+rules:
+
+  axa-http-allowed-codes-and-verbs:
+    description: Only use allowed HTTP status codes with the allowed verbs (allowedList)
+    type: validation
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: error
+    then:
+      function: axa-http-allowed-codes-and-verbs
+      functionOptions:
+        allowedVerbs: [POST, GET, PUT, PATCH, DELETE]
+        allowed:
+          200: [ALL]
+          201: [POST, PUT]
+          202: [POST, PUT, PATCH, DELETE]
+          204: [PUT, DELETE]
+          304: [GET]
+          400: [POST, GET, PUT, PATCH]
+          401: [ALL]
+          403: [ALL]
+          404: [ALL]
+          422: [POST, GET, PUT, PATCH]
+          500: [ALL]
+          503: [ALL]
+
+  #TODO : replace with standalone rule, included in spectral already ?
+  axa-http-verb-body-allowed:
+    description: Only allow request body for the specified verbs
+    type: validation
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: error
+    then:
+      function: axa-http-verb-body-allowed
+      functionOptions:
+        allowed: [POST, PUT, PATCH]
+
+#  TODO : replace with standalone rule
+  axa-http-verb-query-allowed:
+    description: Only allow request query params for the specified verbs
+    type: validation
+    given: '$.paths'
+    message: '{{error}}'
+    recommended: true
+    severity: error
+    then:
+      function: axa-http-verb-query-allowed
+      functionOptions:
+        allowed: [GET]
+
+  axa-no-query-parameter-on-get-single-element:
+    type: style
+    severity: hint
+    recommended: true
+    formats: ["oas3"]
+    description: Only GET endpoints that return a collection can define query parameters.
+    message: "Path which end with a path parameter should not have query parameters."
+    given: "$.paths[?(@property.endsWith('}'))][?(@property === 'get')].parameters[?(@.in === 'query')]"
+    then:
+      function: falsy

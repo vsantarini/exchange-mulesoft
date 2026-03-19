@@ -1,0 +1,44 @@
+[
+    {
+      "header": "Authorization"
+    },
+	{
+      "header": "X-Axa-Context"
+    },
+	{
+      "header": "X-Axa-Apikey"
+    },
+	{
+      "header": "X-Axa-InitialMsgId"
+    },
+	{
+      "header": "Accept"
+    },
+	{
+      "header": "Accept-Language"
+    },
+	{
+      "header": "Content-Type"
+    },
+	{
+      "header": "Content-Language"
+    },
+	{
+      "header": "Origin"
+    },
+	{
+      "header": "Content-Disposition"
+    },
+	{
+      "header": "Content-Length"
+    },
+	{
+      "header": "Range"
+    },
+	{
+      "header": "Cache-Control"
+    },
+	{
+      "header": "If-None-Match"
+    }
+]

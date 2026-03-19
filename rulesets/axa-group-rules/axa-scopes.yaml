@@ -1,0 +1,52 @@
+rules:
+  axa-invalid-scope-format:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: The scope must starts with 'urn:' and be followed by snaked_case string separated by dot.
+    message: "The scope must starts with 'urn:' and be followed by snaked_case string separated by dot"
+    given: "$.paths.*.*.security.*.*.*"
+    then:
+      function: pattern
+      functionOptions:
+        match: ^urn:[a-z_]+(\.[a-z_]+)+$
+
+  axa-invalid-safe-method-scope-suffix:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Every scope for a safe method (GET, OPTIONS) must end with "read_only"
+    message: "The scope for GET must ends with '.read_only'"
+    given: "$.paths.*[?(['get', 'options'].includes(@property))].security.*.*.*"
+    then:
+      function: pattern
+      functionOptions:
+        match: \.read_only$
+
+  axa-invalid-post-scope-suffix:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: A scope of a POST method must end with 'write' or 'read_only'
+    message: "The scope for POST must ends with '.write' or '.read_only'"
+    given: "$.paths.*[?(['post'].includes(@property))].security.*.*.*"
+    then:
+      function: pattern
+      functionOptions:
+        match: \.(write|read_only)$
+
+  axa-invalid-write-scope-suffix:
+    type: validation
+    severity: error
+    recommended: true
+    formats: ["oas3"]
+    description: Every scope for a PUT, PATCH or DELETE must end with ".write"
+    message: "The scope for PUT, PATH, or DELETE must ends with '.write'"
+    given: "$.paths.*[?(['delete', 'patch', 'put'].includes(@property))].security.*.*.*"
+    then:
+      function: pattern
+      functionOptions:
+        match: \.write$
