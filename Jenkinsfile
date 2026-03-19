@@ -184,11 +184,15 @@ pipeline {
 
 post {
  always {
+ script {
   def status = currentBuild.result == 'FAILURE' ? 'failure' : 'success'
   bat '"%PYTHON%" scripts/notify.py --api-list api-list.json --teams-webhook %TEAMS_WEBHOOK% --email %NOTIFY_EMAIL% --status failure'
+  }
   mail to: 'v.santarini@reply.it',
                  subject: "Build Notification: ${currentBuild.fullDisplayName}",
                  body: "Check console output at ${env.BUILD_URL} to view build details."
+ }
+ cleanup{
  cleanWs()
  }
 }
