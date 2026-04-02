@@ -503,3 +503,27 @@ repo/
 │ │	└── common.xsd ← XSD condiviso (additionalFiles)
 │ └── images/
 │   └── integration-pattern.png
+
+
+
+##Certificates sheet
+In base alla struttura definita negli script e nel template Excel aggiornato, le colonne del foglio Certificates sono le seguenti:
+
+#	Colonna	Tipo	Obbligatorio	Descrizione
+1	appName	Stringa	✅	Nome dell'applicazione consumer a cui il certificato è associato (chiave di correlazione con il foglio Applications)
+2	certAlias	Stringa	✅	Alias univoco del certificato all'interno del truststore
+3	certFilePath	Stringa	✅	Path relativo al file del certificato nel workspace (es. certs/finance-client.pem)
+4	certFormat	Lista	✅	Formato del certificato — valori ammessi: PEM, CRT, P12, PFX, JKS
+5	certPassword	Stringa	Solo per P12/PFX/JKS	Password per l'apertura del certificato (vuota per PEM/CRT/DER)
+6	certSubjectDN	Stringa	No	Subject Distinguished Name pre-compilato; se vuoto, verrà estratto automaticamente dallo script extract_cert_sdn.py
+7	targetEnv	Lista	✅	Ambiente target del Flex Gateway — valori ammessi: dev, test, uat, prod
+8	secretGroupName	Stringa	✅	Nome del Secret Group in Anypoint Secrets Manager che contiene il truststore
+9	truststoreName	Stringa	✅	Nome del truststore nel quale inserire il certificato
+10	useAsClientId	Booleano	✅	Se TRUE, l'SDN del certificato viene usato come clientId dell'applicazione in API Manager
+11	expirationDate	Data	No	Data di scadenza del certificato (utile per monitoraggio e alerting)
+12	notes	Stringa	No	Note libere (es. scopo del certificato, referente, ticket di riferimento)
+
+Vincoli di validazione applicati
+certFormat → lista chiusa: PEM, CRT, P12, PFX, JKS
+targetEnv → lista chiusa: dev, test, uat, prod
+useAsClientId → lista chiusa: TRUE, FALSE

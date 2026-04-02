@@ -34,18 +34,25 @@ pipeline {
 
  stage('Install Dependencies') {
 	 steps {
-	 bat '"%PYTHON%" -m pip install --quiet openpyxl requests openai pyyaml zeep Pillow swagger-spec-validator'
+	 bat '"%PYTHON%" -m pip install --quiet openpyxl requests openai pyyaml zeep Pillow swagger-spec-validator cryptography pyjks asn1crypto'
 	 }
 }
 
  stage('Read Excel') {
  steps {
 
-	bat '"%PYTHON%" scripts/read_input_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json'
+	bat '"%PYTHON%" scripts/read_input_excel.py --file "%WORKSPACE%\\api-catalog.xlsx" --output-apis api-list.json --output-apps app-list.json --output-certs cert-list.json'
 	bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step read_excel'
 	
  }
  }
+ 
+ stage('Extract Certificate SDN') {
+ steps {
+ bat '"%PYTHON%" scripts/extract_cert_sdn.py --cert-list cert-list.json --output cert-list-enriched.json --full-metadata'
+ bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step extract_cert_sdn'
+ }
+}
 
 
  stage('Authenticate') {
@@ -150,12 +157,17 @@ pipeline {
 
  stage('Create/Update Consumer Applications') {
 	steps {
-		bat '"%PYTHON%" scripts/manage_applications.py --app-list app-list.json --token token.json --org-id %ANYPOINT_ORG_ID% --output app-ids.json'
+		bat '"%PYTHON%" scripts/manage_applications.py --app-list app-list.json --token token.json --org-id %ANYPOINT_ORG_ID% --cert-list cert-list-enriched.json --output app-ids.json'
 		archiveArtifacts artifacts: 'app-ids.json'
 		bat '"%PYTHON%" scripts/pipeline_state.py --action mark --step manage_applications'
 	}
  }
  
+ stage('Add Client Cert to Flex GW Truststore') {
+ steps {
+ bat '"%PYTHON%" scripts/manage_flex_truststore.py --token token.json --org-id %ANYPOINT_ORG_ID% --cert-list cert-list-enriched.json'
+ }
+}
  /**
 
  stage('Create Contracts') {
